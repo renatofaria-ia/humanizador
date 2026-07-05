@@ -86,6 +86,24 @@ export const demoTextDetail: TextDetail = {
   profile: demoProfiles[0],
   current_version: demoVersions[0],
   versions: demoVersions,
+  related_outputs: [
+    {
+      id: "demo-text-1",
+      title: "Legenda para Instagram sobre automacao de IA",
+      profile_id: "demo-profile-renato",
+      channel_key: "instagram",
+      status: "em_revisao",
+      updated_at: now,
+    },
+    {
+      id: "demo-text-2",
+      title: "Legenda para Instagram sobre automacao de IA",
+      profile_id: "demo-profile-renato",
+      channel_key: "linkedin",
+      status: "rascunho",
+      updated_at: now,
+    },
+  ],
 };
 
 export const demoTexts = [demoTextRecord];

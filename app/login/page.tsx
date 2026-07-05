@@ -8,10 +8,11 @@ import { SubmitButton } from "@/components/submit-button";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sent?: string }>;
+  searchParams: Promise<{ sent?: string; error?: string; retry_after?: string }>;
 }) {
   const access = await getAppAccess();
   const params = await searchParams;
+  const retryAfter = Number(params.retry_after ?? "0");
 
   if (access.mode === "ready") {
     return (
@@ -25,7 +26,7 @@ export default async function LoginPage({
           </p>
           <Link
             href="/"
-            className="mt-6 inline-flex rounded-full bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white"
+            className="button-ink mt-6"
           >
             Abrir painel
           </Link>
@@ -89,6 +90,26 @@ export default async function LoginPage({
               Link enviado. Abra seu email e use o acesso magico para concluir o login.
             </div>
           ) : null}
+          {params.error === "rate_limited" ? (
+            <div className="mt-5 rounded-[22px] bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Aguarde {Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 16} segundos antes de pedir outro magic link.
+            </div>
+          ) : null}
+          {params.error === "auth_error" ? (
+            <div className="mt-5 rounded-[22px] bg-rose-50 px-4 py-3 text-sm text-rose-900">
+              Nao foi possivel enviar o link de acesso agora. Tente novamente em instantes.
+            </div>
+          ) : null}
+          {params.error === "owner_mismatch" ? (
+            <div className="mt-5 rounded-[22px] bg-rose-50 px-4 py-3 text-sm text-rose-900">
+              Este app aceita apenas o email do owner configurado.
+            </div>
+          ) : null}
+          {params.error === "setup" ? (
+            <div className="mt-5 rounded-[22px] bg-rose-50 px-4 py-3 text-sm text-rose-900">
+              O setup do Supabase ainda nao foi finalizado.
+            </div>
+          ) : null}
           <form action={requestMagicLinkAction} className="mt-6 space-y-4">
             <div>
               <label className="field-label" htmlFor="email">
@@ -103,7 +124,16 @@ export default async function LoginPage({
                 className="field"
               />
             </div>
-            <SubmitButton label="Enviar magic link" pendingLabel="Enviando..." />
+            <SubmitButton
+              label="Enviar magic link"
+              pendingLabel="Enviando..."
+              cooldownSeconds={
+                params.error === "rate_limited" && Number.isFinite(retryAfter) && retryAfter > 0
+                  ? retryAfter
+                  : 0
+              }
+              cooldownLabel={`Aguarde ${Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 16}s`}
+            />
           </form>
         </section>
       </div>

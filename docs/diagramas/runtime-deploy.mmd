@@ -1,0 +1,26 @@
+%%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
+flowchart LR
+  B["Browser"] --> UI
+
+  subgraph V["Vercel / Next.js 16 App Router"]
+    UI["UI pages<br/>/, login, profiles, texts"]
+    SA["Actions + API<br/>actions.ts, app/api/*"]
+    AH["Auth helpers<br/>proxy, callback, supabase/*"]
+    LD["Domain libs<br/>data, generation, protocol"]
+    ENV["Env<br/>Supabase keys, OpenAI key, owner email"]
+  end
+
+  SA --> AH
+  SA --> LD
+  ENV -.-> SA
+  SA --> AUTH
+  SA --> DB
+  LD --> AI
+  UI --> SA
+
+  DB["Supabase Postgres<br/>profiles, texts, text_versions<br/>channel_presets"]
+  AUTH["Supabase Auth"]
+  AI["OpenAI API"]
+  JOB["Sem jobs dedicados"]
+
+  V -.-> JOB

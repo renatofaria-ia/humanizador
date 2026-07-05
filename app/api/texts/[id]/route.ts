@@ -1,5 +1,5 @@
 import { getTextDetail, updateTextDraft } from "@/lib/data";
-import { ChannelKey, TextControls } from "@/lib/types";
+import { TextControls } from "@/lib/types";
 import { jsonError, jsonOk } from "@/lib/api";
 
 export async function GET(
@@ -33,7 +33,6 @@ export async function PATCH(
       title: String(body.title ?? ""),
       originalText: String(body.original_text ?? ""),
       profileId: String(body.profile_id ?? ""),
-      channelKey: String(body.channel_key ?? "generico") as ChannelKey,
       controls: {
         objetivo: String(controls.objetivo ?? ""),
         cta: String(controls.cta ?? ""),

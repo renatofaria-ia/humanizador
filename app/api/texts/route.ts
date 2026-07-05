@@ -1,4 +1,4 @@
-import { createText, listTexts } from "@/lib/data";
+import { createTextBundle, listTexts } from "@/lib/data";
 import { ChannelKey, TextControls } from "@/lib/types";
 import { jsonError, jsonOk } from "@/lib/api";
 
@@ -14,16 +14,19 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Record<string, unknown>;
     const controls = (body.controls ?? {}) as Partial<TextControls>;
+    const channelKeys = Array.isArray(body.channel_keys)
+      ? body.channel_keys.map((value) => String(value ?? ""))
+      : [String(body.channel_key ?? "generico")];
 
-    const id = await createText({
+    const result = await createTextBundle({
       title: String(body.title ?? ""),
       originalText: String(body.original_text ?? ""),
       profileId: String(body.profile_id ?? ""),
-      channelKey: String(body.channel_key ?? "generico") as ChannelKey,
+      channelKeys: channelKeys as ChannelKey[],
       controls,
     });
 
-    return jsonOk({ id }, 201);
+    return jsonOk(result, 201);
   } catch (error) {
     return jsonError(error, 400);
   }

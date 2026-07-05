@@ -143,9 +143,17 @@ export type TextSummary = TextRecord & {
   current_version?: TextVersion | null;
 };
 
+export type TextOutputVariant = Pick<
+  TextRecord,
+  "id" | "title" | "channel_key" | "status" | "updated_at"
+> & {
+  profile_id: string;
+};
+
 export type TextDetail = TextSummary & {
   profile: Profile | null;
   versions: TextVersion[];
+  related_outputs: TextOutputVariant[];
 };
 
 export type AppViewer = {

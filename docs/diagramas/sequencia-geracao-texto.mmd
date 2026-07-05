@@ -1,0 +1,26 @@
+sequenceDiagram
+  participant U as Usuario
+  participant P as /texts/[id]
+  participant A as actions.ts
+  participant D as data.ts
+  participant G as generation.ts
+  participant O as OpenAI API
+  participant DB as Postgres
+
+  U->>P: Gerar sugestao
+  P->>A: generateTextAction()
+  A->>D: generateVersionForText()
+  D->>DB: getTextDetail()
+  DB-->>D: profile + versions + related_outputs
+  D->>G: generateHumanizedOutput()
+  G->>O: generateObject()
+
+  alt sucesso
+    O-->>G: payload
+    G->>DB: insert text_versions (llm)
+    G->>DB: update text current_version_id/status
+    D-->>P: revalidatePath()
+  else erro
+    G->>DB: insertGenerationError()
+    G-->>P: falha na geracao
+  end

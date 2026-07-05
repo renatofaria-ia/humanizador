@@ -17,7 +17,7 @@ export function DashboardShell({ children, email }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-[var(--page-background)]">
       <div className="mx-auto flex w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-        <header className="rounded-[32px] border border-white/60 bg-white/85 px-6 py-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+        <header className="shell-card px-6 py-5">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--ink-muted)]">
@@ -33,7 +33,7 @@ export function DashboardShell({ children, email }: DashboardShellProps) {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="rounded-full border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--ink)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface)]"
+                    className="pill-action"
                   >
                     {link.label}
                   </Link>
@@ -41,10 +41,7 @@ export function DashboardShell({ children, email }: DashboardShellProps) {
               </nav>
               {email ? (
                 <form action={signOutAction}>
-                  <button
-                    type="submit"
-                    className="rounded-full bg-[var(--ink)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-                  >
+                  <button type="submit" className="button-ink">
                     Sair
                   </button>
                 </form>
@@ -55,7 +52,7 @@ export function DashboardShell({ children, email }: DashboardShellProps) {
             <p className="mt-4 text-sm text-[var(--ink-soft)]">Logado como {email}</p>
           ) : null}
         </header>
-        <main className="mt-6">{children}</main>
+        <main className="mt-6 min-w-0">{children}</main>
       </div>
     </div>
   );

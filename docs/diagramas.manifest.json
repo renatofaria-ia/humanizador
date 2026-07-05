@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "diagram": "docs/diagramas/arquitetura-geral.mmd",
+      "paths": {
+        "prefixes": [
+          "app/",
+          "components/",
+          "lib/",
+          "supabase/"
+        ],
+        "exact": [
+          "proxy.ts",
+          "next.config.ts",
+          "package.json"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/fluxo-autenticacao.mmd",
+      "paths": {
+        "prefixes": [
+          "app/login/",
+          "app/auth/",
+          "lib/supabase/"
+        ],
+        "exact": [
+          "app/actions.ts",
+          "lib/app-context.ts",
+          "lib/env.ts",
+          "proxy.ts"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/ciclo-texto.mmd",
+      "paths": {
+        "prefixes": [
+          "app/texts/",
+          "app/profiles/"
+        ],
+        "exact": [
+          "app/page.tsx",
+          "app/actions.ts",
+          "components/dashboard-shell.tsx",
+          "components/status-badge.tsx",
+          "components/submit-button.tsx",
+          "lib/channel-presets.ts",
+          "lib/data.ts",
+          "lib/demo-data.ts",
+          "lib/types.ts"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/estado-texto.mmd",
+      "paths": {
+        "prefixes": [
+          "app/texts/"
+        ],
+        "exact": [
+          "lib/data.ts",
+          "lib/types.ts",
+          "supabase/schema.sql"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/sequencia-geracao-texto.mmd",
+      "paths": {
+        "prefixes": [
+          "app/texts/"
+        ],
+        "exact": [
+          "app/actions.ts",
+          "lib/channel-presets.ts",
+          "lib/data.ts",
+          "lib/generation.ts",
+          "lib/humanizer-protocol.ts",
+          "lib/types.ts",
+          "supabase/schema.sql"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/modelo-dados.mmd",
+      "paths": {
+        "exact": [
+          "supabase/schema.sql",
+          "lib/types.ts",
+          "lib/data.ts"
+        ]
+      }
+    },
+    {
+      "diagram": "docs/diagramas/runtime-deploy.mmd",
+      "paths": {
+        "prefixes": [
+          "app/",
+          "components/",
+          "lib/",
+          "supabase/"
+        ],
+        "exact": [
+          "package.json",
+          "next.config.ts",
+          "proxy.ts",
+          "app/layout.tsx",
+          "app/globals.css",
+          "app/auth/callback/route.ts",
+          "lib/env.ts"
+        ]
+      }
+    }
+  ],
+  "ignorePrefixes": [
+    "docs/diagramas/",
+    ".next/",
+    ".vercel/",
+    "node_modules/"
+  ]
+}

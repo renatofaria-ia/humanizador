@@ -12,7 +12,7 @@ const STATUS_STYLES: Record<TextStatus, string> = {
 export function StatusBadge({ status }: { status: TextStatus }) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${STATUS_STYLES[status]}`}
+      className={`inline-flex rounded-[var(--radius-pill)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${STATUS_STYLES[status]}`}
     >
       {status.replace("_", " ")}
     </span>

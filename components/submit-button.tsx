@@ -1,30 +1,54 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 type SubmitButtonProps = {
   label: string;
   pendingLabel?: string;
   className?: string;
+  cooldownSeconds?: number;
+  cooldownLabel?: string;
 };
 
 export function SubmitButton({
   label,
   pendingLabel,
   className,
+  cooldownSeconds = 0,
+  cooldownLabel,
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
+  const [remaining, setRemaining] = useState(cooldownSeconds);
+
+  useEffect(() => {
+    if (remaining <= 0) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setRemaining((current) => Math.max(current - 1, 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [remaining]);
+
+  const isCoolingDown = remaining > 0;
 
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || isCoolingDown}
       className={
         className ??
-        "rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        "button-primary"
       }
     >
-      {pending ? pendingLabel ?? "Salvando..." : label}
+      {pending
+        ? pendingLabel ?? "Salvando..."
+        : isCoolingDown
+          ? cooldownLabel ?? `Aguarde ${remaining}s`
+          : label}
     </button>
   );
 }

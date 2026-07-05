@@ -6,8 +6,9 @@ import { redirect } from "next/navigation";
 import { getRedirectUrl, requireReadyUser } from "@/lib/app-context";
 import { getAppEnv } from "@/lib/env";
 import {
+  createAdditionalOutputs,
   createProfile,
-  createText,
+  createTextBundle,
   duplicateText,
   generateVersionForText,
   insertGenerationError,
@@ -27,17 +28,39 @@ function readNumber(formData: FormData, key: string, fallback = 3) {
   return Number.isFinite(value) ? value : fallback;
 }
 
+function readChannelKeys(formData: FormData, key: string) {
+  return formData
+    .getAll(key)
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+}
+
+function buildLoginErrorUrl(code: string, retryAfterSeconds?: number) {
+  const params = new URLSearchParams({ error: code });
+
+  if (typeof retryAfterSeconds === "number") {
+    params.set("retry_after", String(retryAfterSeconds));
+  }
+
+  return `/login?${params.toString()}`;
+}
+
+function extractRetryAfterSeconds(message: string) {
+  const match = message.match(/after (\d+) seconds?/i);
+  return match ? Number(match[1]) : undefined;
+}
+
 export async function requestMagicLinkAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const env = getAppEnv();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    throw new Error("Supabase nao configurado.");
+    redirect(buildLoginErrorUrl("setup"));
   }
 
   if (env.ownerEmail && email !== env.ownerEmail) {
-    throw new Error("Este app aceita apenas o email do owner configurado.");
+    redirect(buildLoginErrorUrl("owner_mismatch"));
   }
 
   const { error } = await supabase.auth.signInWithOtp({
@@ -48,7 +71,16 @@ export async function requestMagicLinkAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(error.message);
+    if (error.message.includes("request this after")) {
+      redirect(
+        buildLoginErrorUrl(
+          "rate_limited",
+          extractRetryAfterSeconds(error.message) ?? 16,
+        ),
+      );
+    }
+
+    redirect(buildLoginErrorUrl("auth_error"));
   }
 
   redirect("/login?sent=1");
@@ -96,11 +128,15 @@ export async function updateProfileAction(formData: FormData) {
 }
 
 export async function createTextAction(formData: FormData) {
-  const textId = await createText({
+  const selectedChannels = readChannelKeys(formData, "output_channels");
+  const { created } = await createTextBundle({
     title: String(formData.get("title") ?? ""),
     originalText: String(formData.get("original_text") ?? ""),
     profileId: String(formData.get("profile_id") ?? ""),
-    channelKey: String(formData.get("channel_key") ?? "generico") as never,
+    channelKeys:
+      (selectedChannels.length
+        ? selectedChannels
+        : [String(formData.get("channel_key") ?? "linkedin")]) as never,
     controls: {
       objetivo: String(formData.get("objetivo") ?? ""),
       cta: String(formData.get("cta") ?? ""),
@@ -115,9 +151,15 @@ export async function createTextAction(formData: FormData) {
     },
   });
 
+  const redirectId = created[0]?.id;
+
+  if (!redirectId) {
+    throw new Error("Nenhum output foi criado para este texto.");
+  }
+
   revalidatePath("/");
   revalidatePath("/texts");
-  redirect(`/texts/${textId}`);
+  redirect(`/texts/${redirectId}`);
 }
 
 export async function updateTextDraftAction(formData: FormData) {
@@ -126,7 +168,6 @@ export async function updateTextDraftAction(formData: FormData) {
     title: String(formData.get("title") ?? ""),
     originalText: String(formData.get("original_text") ?? ""),
     profileId: String(formData.get("profile_id") ?? ""),
-    channelKey: String(formData.get("channel_key") ?? "generico") as never,
     controls: {
       objetivo: String(formData.get("objetivo") ?? ""),
       cta: String(formData.get("cta") ?? ""),
@@ -150,6 +191,18 @@ export async function duplicateTextAction(formData: FormData) {
   const duplicatedId = await duplicateText(textId);
   revalidatePath("/texts");
   redirect(`/texts/${duplicatedId}`);
+}
+
+export async function createAdditionalOutputsAction(formData: FormData) {
+  const textId = String(formData.get("text_id") ?? "");
+  const selectedChannels = readChannelKeys(formData, "output_channels");
+  const { created } = await createAdditionalOutputs(textId, selectedChannels as never);
+  const redirectId = created[0]?.id ?? textId;
+
+  revalidatePath(`/texts/${textId}`);
+  revalidatePath("/texts");
+  revalidatePath("/");
+  redirect(`/texts/${redirectId}`);
 }
 
 export async function saveManualVersionAction(formData: FormData) {

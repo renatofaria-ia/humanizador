@@ -1,0 +1,21 @@
+stateDiagram-v2
+  [*] --> rascunho
+  rascunho --> gerado: gerar
+  gerado --> em_revisao: revisar
+  em_revisao --> aprovado: aprovar
+  gerado --> aprovado: aprovar
+  aprovado --> publicado: publicar
+  publicado --> arquivado: arquivar
+  rascunho --> arquivado: arquivar
+  gerado --> arquivado: arquivar
+  em_revisao --> arquivado: arquivar
+  aprovado --> arquivado: arquivar
+  publicado --> em_revisao: reabrir
+
+  note right of em_revisao
+    assertTransition()
+  end note
+
+  note left of rascunho
+    status do enum
+  end note

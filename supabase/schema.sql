@@ -38,6 +38,7 @@ create table if not exists public.channel_presets (
 create table if not exists public.texts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
+  source_bundle_id uuid not null default gen_random_uuid(),
   title text not null,
   original_text text not null,
   profile_id uuid not null references public.profiles(id) on delete restrict,
@@ -59,6 +60,9 @@ create table if not exists public.texts (
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.texts
+  add column if not exists source_bundle_id uuid not null default gen_random_uuid();
 
 create table if not exists public.text_versions (
   id uuid primary key default gen_random_uuid(),
@@ -98,9 +102,12 @@ $$;
 
 create index if not exists profiles_user_id_idx on public.profiles(user_id);
 create index if not exists texts_user_id_idx on public.texts(user_id);
+create index if not exists texts_source_bundle_id_idx on public.texts(source_bundle_id);
 create index if not exists texts_status_idx on public.texts(status);
 create index if not exists text_versions_text_id_idx on public.text_versions(text_id);
 create index if not exists text_versions_user_id_idx on public.text_versions(user_id);
+create unique index if not exists texts_user_source_bundle_channel_key_idx
+  on public.texts(user_id, source_bundle_id, channel_key);
 
 drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at

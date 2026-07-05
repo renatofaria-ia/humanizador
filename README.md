@@ -110,6 +110,13 @@ Se o Supabase ou a OpenAI nao estiverem configurados, a interface entra em modo 
 - O app salva a resposta estruturada completa mesmo quando a interface mostra apenas o texto final.
 - Os presets de canal existem no banco e tambem estao espelhados na camada de aplicacao para manter o MVP simples.
 
+## Diagramas
+
+- Os diagramas fonte ficam em `docs/diagramas/*.mmd` e usam Mermaid.
+- `AGENTS.md` define que esses Mermaid sao a fonte canonica para agentes e atualizacao documental.
+- O guard local roda com `npm run diagramas:check`.
+- A validacao falha quando arquivos de arquitetura ou fluxo mudam sem a atualizacao do diagrama correspondente.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

@@ -1,0 +1,46 @@
+erDiagram
+  AUTH_USERS ||--o| PROFILES : profile
+  AUTH_USERS ||--o{ TEXTS : owns
+  AUTH_USERS ||--o{ TEXT_VERSIONS : writes
+  PROFILES ||--o{ TEXTS : selected_for
+  CHANNEL_PRESETS ||--o{ TEXTS : defines
+  TEXTS ||--o{ TEXT_VERSIONS : versions
+  TEXTS ||--o| TEXT_VERSIONS : current_version
+
+  AUTH_USERS {
+    uuid id PK
+    text email
+  }
+
+  PROFILES {
+    uuid user_id PK, FK
+    text nome
+    int nivel_firmeza
+    int nivel_humor
+  }
+
+  TEXTS {
+    uuid id PK
+    uuid user_id FK
+    uuid profile_id FK
+    text channel_key FK
+    uuid source_bundle_id
+    text status
+    uuid current_version_id FK
+  }
+
+  CHANNEL_PRESETS {
+    text key PK
+    text label
+    text intencao
+  }
+
+  TEXT_VERSIONS {
+    uuid id PK
+    uuid text_id FK
+    uuid user_id FK
+    text source
+    int version_number
+    jsonb output_payload_json
+    text error
+  }

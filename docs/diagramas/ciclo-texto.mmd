@@ -1,0 +1,21 @@
+%%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
+flowchart LR
+  subgraph CRI["Criacao"]
+    N1["Novo job"] --> N2["createTextBundle"] --> N3["texts<br/>1 bundle = N canais"] --> N4["/texts/[id]"]
+    N3 -.-> N5["duplicateText"]
+    N3 -.-> N6["createAdditionalOutputs"]
+  end
+
+  subgraph GER["Geracao"]
+    N4 --> N7["generateVersionForText"] --> N8["generateHumanizedOutput"] --> N9["OpenAI generateObject"] --> N10["text_versions<br/>source = llm"]
+    N8 -.-> ERR["erro<br/>insertGenerationError()"]
+  end
+
+  subgraph POS["Pos-geracao"]
+    N10 --> N11["update text<br/>current_version_id + status"] --> R["revalidatePath()"] --> N12["Revisar"]
+    N12 -->|aprovar| N15["updateTextStatus"]
+    N12 -->|arquivar| N16["Publicado / arquivado"]
+    N12 --> N13["saveManualVersion"] --> N14["text_versions<br/>source = manual"] --> N15
+    N13 -->|arquivar| N16
+    N15 --> N16
+  end

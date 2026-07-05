@@ -1,0 +1,19 @@
+%%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
+flowchart LR
+  subgraph APP["Aplicacao"]
+    UI["UI<br/>pages: /, login, profiles, texts<br/>components/*"]
+    SV["App server<br/>actions, api, app-context<br/>data, generation, proxy"]
+    JOB["Jobs<br/>nao ha fila dedicada"]
+  end
+
+  subgraph EXT["Servicos externos"]
+    AUTH["Supabase Auth<br/>magic link + sessao"]
+    DB[("Supabase Postgres<br/>profiles, texts, text_versions<br/>channel_presets")]
+    AI["OpenAI API<br/>generateObject + prompt fixo"]
+  end
+
+  UI -->|navegacao| SV
+  SV -->|login| AUTH
+  SV -->|CRUD + RLS| DB
+  SV -->|geracao| AI
+  SV -.-> JOB

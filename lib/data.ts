@@ -9,11 +9,38 @@ import {
   Profile,
   TextControls,
   TextDetail,
+  TextOutputVariant,
   TextRecord,
   TextStatus,
   TextSummary,
   TextVersion,
 } from "@/lib/types";
+
+function normalizeChannelKeys(channelKeys: ChannelKey[]) {
+  return [...new Set(channelKeys)].filter(Boolean);
+}
+
+async function listRelatedOutputsForSource(input: {
+  title: string;
+  originalText: string;
+  profileId: string;
+}) {
+  const { supabase, user } = await requireReadyUser();
+  const { data, error } = await supabase
+    .from("texts")
+    .select("id, title, profile_id, channel_key, status, updated_at")
+    .eq("user_id", user.id)
+    .eq("title", input.title)
+    .eq("original_text", input.originalText)
+    .eq("profile_id", input.profileId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as TextOutputVariant[];
+}
 
 function mapControls(record: TextRecord): TextControls {
   return {
@@ -122,6 +149,12 @@ export async function getTextDetail(textId: string) {
     throw new Error(versionError.message);
   }
 
+  const relatedOutputs = await listRelatedOutputsForSource({
+    title: text.title,
+    originalText: text.original_text,
+    profileId: text.profile_id,
+  });
+
   const currentVersion =
     (versions ?? []).find((version) => version.id === text.current_version_id) ??
     (versions ?? [])[0] ??
@@ -132,6 +165,7 @@ export async function getTextDetail(textId: string) {
     profile: (text as { profiles?: Profile }).profiles ?? null,
     current_version: currentVersion as TextVersion | null,
     versions: (versions ?? []) as TextVersion[],
+    related_outputs: (relatedOutputs ?? []) as TextOutputVariant[],
   } as TextDetail;
 }
 
@@ -203,24 +237,76 @@ export async function createText(input: {
   return data.id as string;
 }
 
+export async function createTextBundle(input: {
+  title: string;
+  originalText: string;
+  profileId: string;
+  channelKeys: ChannelKey[];
+  controls?: Partial<TextControls>;
+}) {
+  const { supabase, user } = await requireReadyUser();
+  const controls = { ...DEFAULT_TEXT_CONTROLS, ...(input.controls ?? {}) };
+  const channelKeys = normalizeChannelKeys(input.channelKeys);
+
+  if (!channelKeys.length) {
+    throw new Error("Selecione pelo menos um canal de output.");
+  }
+  const { data, error } = await supabase
+    .from("texts")
+    .insert(
+      channelKeys.map((channelKey) => ({
+        user_id: user.id,
+        title: input.title,
+        original_text: input.originalText,
+        profile_id: input.profileId,
+        channel_key: channelKey,
+        status: "rascunho",
+        objetivo: controls.objetivo,
+        cta: controls.cta,
+        tom: controls.tom,
+        tamanho: controls.tamanho,
+        formalidade: controls.formalidade,
+        usar_emojis: controls.usarEmojis,
+        usar_hashtags: controls.usarHashtags,
+        primeira_pessoa: controls.primeiraPessoa,
+        nivel_ousadia: controls.nivelOusadia,
+        instrucoes_extras: controls.instrucoesExtras,
+      })),
+    )
+    .select("id, channel_key");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    created: (data ?? []) as Array<{ id: string; channel_key: ChannelKey }>,
+  };
+}
+
 export async function updateTextDraft(
   textId: string,
   input: {
     title: string;
     originalText: string;
     profileId: string;
-    channelKey: ChannelKey;
     controls: TextControls;
   },
 ) {
+  const detail = await getTextDetail(textId);
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
   const { supabase, user } = await requireReadyUser();
+  const relatedOutputIds = detail.related_outputs.map((output) => output.id);
   const { error } = await supabase
     .from("texts")
     .update({
       title: input.title,
       original_text: input.originalText,
       profile_id: input.profileId,
-      channel_key: input.channelKey,
       objetivo: input.controls.objetivo,
       cta: input.controls.cta,
       tom: input.controls.tom,
@@ -232,7 +318,7 @@ export async function updateTextDraft(
       nivel_ousadia: input.controls.nivelOusadia,
       instrucoes_extras: input.controls.instrucoesExtras,
     })
-    .eq("id", textId)
+    .in("id", relatedOutputIds)
     .eq("user_id", user.id);
 
   if (error) {
@@ -252,6 +338,33 @@ export async function duplicateText(textId: string) {
     originalText: detail.original_text,
     profileId: detail.profile_id,
     channelKey: detail.channel_key,
+    controls: mapControls(detail),
+  });
+}
+
+export async function createAdditionalOutputs(textId: string, channelKeys: ChannelKey[]) {
+  const detail = await getTextDetail(textId);
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
+  const existingChannels = new Set(detail.related_outputs.map((output) => output.channel_key));
+  const missingChannels = normalizeChannelKeys(channelKeys).filter(
+    (channelKey) => !existingChannels.has(channelKey),
+  );
+
+  if (!missingChannels.length) {
+    return {
+      created: [] as Array<{ id: string; channel_key: ChannelKey }>,
+    };
+  }
+
+  return createTextBundle({
+    title: detail.title,
+    originalText: detail.original_text,
+    profileId: detail.profile_id,
+    channelKeys: missingChannels,
     controls: mapControls(detail),
   });
 }
@@ -426,7 +539,7 @@ export async function insertGenerationError(textId: string, message: string) {
     user_id: user.id,
     source: "llm",
     version_number: versionNumber,
-    notes: "Falha na geracao",
+    notes: `Falha na geracao: ${message}`,
     error: message,
   });
 

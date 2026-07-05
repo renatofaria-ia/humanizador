@@ -15,15 +15,15 @@ import {
 import { ChannelPreset, GenerationAudit, GenerationOutput, Profile, TextControls } from "@/lib/types";
 
 const metadataSchema = z.object({
-  titulo: z.string().optional(),
-  subtitulo: z.string().optional(),
-  excerpt: z.string().optional(),
-  cta: z.string().optional(),
-  hashtags: z.array(z.string()).optional(),
-  alternativa_abertura: z.string().optional(),
-  hook: z.string().optional(),
-  assunto: z.string().optional(),
-  corpo_email: z.string().optional(),
+  titulo: z.string().nullable(),
+  subtitulo: z.string().nullable(),
+  excerpt: z.string().nullable(),
+  cta: z.string().nullable(),
+  hashtags: z.array(z.string()).nullable(),
+  alternativa_abertura: z.string().nullable(),
+  hook: z.string().nullable(),
+  assunto: z.string().nullable(),
+  corpo_email: z.string().nullable(),
 });
 
 const outputSchema = z.object({
@@ -71,8 +71,15 @@ export async function generateHumanizedOutput(input: {
     durationMs: Date.now() - startedAt,
   };
 
+  const metadadosDoCanal = Object.fromEntries(
+    Object.entries(result.object.metadados_do_canal).filter(([, value]) => value != null),
+  ) as GenerationOutput["metadados_do_canal"];
+
   return {
-    output: result.object as GenerationOutput,
+    output: {
+      ...result.object,
+      metadados_do_canal: metadadosDoCanal,
+    } as GenerationOutput,
     audit,
   };
 }
