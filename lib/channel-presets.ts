@@ -12,14 +12,14 @@ export const CHANNEL_PRESETS: ChannelPreset[] = [
     key: "instagram",
     label: "Instagram",
     descricao: "Legenda com ritmo mais forte, CTA curto e hashtags opcionais.",
-    intencao: "Publicar legenda de Instagram com gancho inicial e fechamento acionavel.",
+    intencao: "Publicar legenda de Instagram com gancho inicial e fechamento acionável.",
     saidasEsperadas: ["texto_final", "cta", "hashtags"],
   },
   {
     key: "x",
     label: "X",
-    descricao: "Versao curta, direta e com possibilidade de abertura alternativa.",
-    intencao: "Publicar no X com impacto rapido e pouco desperdicio de caracteres.",
+    descricao: "Versão curta, direta e com possibilidade de abertura alternativa.",
+    intencao: "Publicar no X com impacto rápido e pouco desperdício de caracteres.",
     saidasEsperadas: ["texto_final", "alternativa_abertura"],
   },
   {
@@ -32,15 +32,15 @@ export const CHANNEL_PRESETS: ChannelPreset[] = [
   {
     key: "email",
     label: "Email",
-    descricao: "Assunto e corpo orientados a resposta ou acao.",
+    descricao: "Assunto e corpo orientados à resposta ou ação.",
     intencao: "Enviar email com assunto forte e corpo direto.",
     saidasEsperadas: ["assunto", "corpo_email", "cta"],
   },
   {
     key: "generico",
-    label: "Generico",
+    label: "Genérico",
     descricao: "Reescrita neutra para uso amplo, sem formato de canal restrito.",
-    intencao: "Humanizar um texto sem destinacao fechada.",
+    intencao: "Humanizar um texto sem destinação fechada.",
     saidasEsperadas: ["texto_final", "resumo_das_alteracoes"],
   },
 ];

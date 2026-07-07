@@ -11,6 +11,7 @@ import {
   DEFAULT_MODEL,
   HUMANIZER_SYSTEM_PROMPT,
   PROMPT_VERSION,
+  resolveHumanizerPreset,
 } from "@/lib/humanizer-protocol";
 import { ChannelPreset, GenerationAudit, GenerationOutput, Profile, TextControls } from "@/lib/types";
 
@@ -32,6 +33,45 @@ const outputSchema = z.object({
   texto_final: z.string(),
   resumo_das_alteracoes: z.string(),
   metadados_do_canal: metadataSchema,
+  diagnostico: z.array(
+    z.object({
+      categoria: z.enum([
+        "conteudo",
+        "linguagem",
+        "tom",
+        "composicao",
+        "estilo",
+        "pt-br",
+        "estrangeirismos",
+      ]),
+      sinal: z.string(),
+      peso: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+      corrigido: z.boolean(),
+      acao: z.string(),
+    }),
+  ),
+  preset_aplicado: z.enum([
+    "neutro-base",
+    "corporativo-informal",
+    "jornalistico",
+    "didatico",
+    "post-social",
+    "cronica",
+    "academico",
+    "juridico",
+    "whatsapp",
+  ]),
+  modo_operacao: z.enum(["direto", "completo", "revisao"]),
+  score_humanizacao: z.object({
+    remocao_ia: z.number().int().min(0).max(100),
+    naturalidade: z.number().int().min(0).max(100),
+    fidelidade: z.number().int().min(0).max(100),
+    consistencia: z.number().int().min(0).max(100),
+    legibilidade: z.number().int().min(0).max(100),
+    total: z.number().int().min(0).max(100),
+  }),
+  alertas: z.array(z.string()),
+  relatorio_curto: z.string(),
 });
 
 export async function generateHumanizedOutput(input: {
@@ -51,8 +91,14 @@ export async function generateHumanizedOutput(input: {
   });
 
   const startedAt = Date.now();
-  const developerPrompt = buildDeveloperPrompt(input.profile);
-  const userPrompt = buildUserPrompt(input.originalText, input.preset, input.controls);
+  const resolvedPreset = resolveHumanizerPreset(input.preset, input.controls);
+  const developerPrompt = buildDeveloperPrompt(input.profile, input.controls.modoOperacao);
+  const userPrompt = buildUserPrompt(
+    input.originalText,
+    input.preset,
+    input.controls,
+    resolvedPreset,
+  );
 
   const result = await generateObject({
     model: openai(DEFAULT_MODEL),
@@ -79,6 +125,10 @@ export async function generateHumanizedOutput(input: {
     output: {
       ...result.object,
       metadados_do_canal: metadadosDoCanal,
+      diagnostico: result.object.diagnostico ?? [],
+      alertas: result.object.alertas ?? [],
+      preset_aplicado: result.object.preset_aplicado ?? resolvedPreset,
+      modo_operacao: result.object.modo_operacao ?? input.controls.modoOperacao,
     } as GenerationOutput,
     audit,
   };

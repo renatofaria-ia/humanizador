@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Humanizador - Fila</title>
+<!-- Tailwind CSS & Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f9f9ff",
+                        "surface-tint": "#a03f30",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-fixed": "#cce5ff",
+                        "surface-container": "#e8eeff",
+                        "on-primary-fixed-variant": "#80281b",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#7a7371",
+                        "on-background": "#161c27",
+                        "primary-container": "#bd5444",
+                        "on-primary-fixed": "#400200",
+                        "tertiary-fixed-dim": "#cdc5c2",
+                        "on-secondary-fixed-variant": "#31495e",
+                        "surface-dim": "#d4daea",
+                        "tertiary": "#615b59",
+                        "inverse-surface": "#2a303d",
+                        "on-secondary-fixed": "#011d31",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#56423e",
+                        "surface-variant": "#dde2f3",
+                        "secondary-container": "#c9e2fd",
+                        "on-secondary-container": "#4d657b",
+                        "surface-container-high": "#e3e8f9",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "secondary": "#496177",
+                        "on-primary": "#ffffff",
+                        "outline": "#89726d",
+                        "inverse-on-surface": "#ecf0ff",
+                        "surface": "#f9f9ff",
+                        "on-tertiary-fixed-variant": "#4b4644",
+                        "outline-variant": "#ddc0bb",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#ffb4a7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "primary": "#9d3d2e",
+                        "inverse-primary": "#ffb4a7",
+                        "surface-container-highest": "#dde2f3",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed": "#eae0de",
+                        "on-surface": "#161c27",
+                        "primary-fixed": "#ffdad4",
+                        "on-tertiary-fixed": "#1f1b19"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Subtle atmospheric gradient overlay */
+        body {
+            background-image: radial-gradient(circle at top right, rgba(204, 229, 255, 0.4) 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(255, 218, 212, 0.3) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-sm antialiased min-h-screen pb-[90px] md:pb-0">
+<!-- TopNavBar (Web) -->
+<nav class="hidden md:flex bg-white/60 dark:bg-surface-container/60 backdrop-blur-2xl border-b border-secondary/20 docked full-width top-0 sticky z-40">
+<div class="flex justify-between items-center w-full px-margin-desktop h-16 max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">
+                Humanizador
+            </div>
+<!-- Navigation Links -->
+<div class="flex gap-gutter h-full items-center">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-full" href="#">Hoje</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-full opacity-90 transition-opacity" href="#">Fila</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-full" href="#">Perfis</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-full" href="#">Novo texto</a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-unit">
+<button aria-label="notifications" class="p-2 text-secondary hover:text-primary transition-colors duration-200 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="settings" class="p-2 text-secondary hover:text-primary transition-colors duration-200 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-secondary/30">
+<img alt="Foto de perfil do editor" class="w-full h-full object-cover" data-alt="A close up portrait of a professional editor in a well lit studio setting, bright clean background, professional attire, engaging subtle smile, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJiBmTBqGA5b1Xo1vGtCQ-Djs0e1SvYJoVccl6aTs6MoPR4lOgWL3QttHu0tQw4ySTTsqovBPIZD_HMR2RviHmgN3KcOh61CJYtuykA-ERBw2923QzVNAzD-5z8PgRAud8ZG68d2gLuq4qCsbm_sXvicRmiqh7xsTjtLbJUFg--eGGRfqjiA9xyNB46Ex901UHn7FfYUfC_ewEqWnJLNFPoPWCXSawOcdrHhb2rDgY3kssyQiNciGYIBjRNs4rp1FY6emzuHclRq0"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Workspace (Max Width 800px for Editorial Focus) -->
+<main class="max-w-[800px] mx-auto px-margin-mobile md:px-0 pt-gutter md:pt-12 pb-gutter">
+<!-- Header -->
+<header class="mb-8">
+<h1 class="font-headline-xl text-headline-xl text-on-background mb-6">Fila de Conteúdo</h1>
+<!-- Tabs -->
+<div class="flex border-b border-secondary/20 gap-8">
+<button class="pb-3 border-b-2 border-primary text-primary font-label-md text-label-md">Em andamento</button>
+<button class="pb-3 border-b-2 border-transparent text-secondary hover:text-primary transition-colors font-label-md text-label-md">Concluídos</button>
+</div>
+</header>
+<!-- Search & Filter Controls -->
+<div class="flex flex-col md:flex-row gap-4 mb-8">
+<!-- Search -->
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary/60 pointer-events-none" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-xl shadow-sm font-body-sm text-body-sm text-on-background focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Buscar na fila..." type="text"/>
+</div>
+<!-- Filters -->
+<div class="flex gap-3">
+<select class="px-4 py-3 bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-xl shadow-sm font-label-sm text-label-sm text-secondary focus:border-primary outline-none cursor-pointer appearance-none pr-10 relative">
+<option value="">Status (Todos)</option>
+<option value="rascunho">Rascunho</option>
+<option value="gerado">Gerado</option>
+<option value="revisao">Em Revisão</option>
+</select>
+<select class="px-4 py-3 bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-xl shadow-sm font-label-sm text-label-sm text-secondary focus:border-primary outline-none cursor-pointer appearance-none pr-10">
+<option value="">Formato</option>
+<option value="blog">Blog</option>
+<option value="linkedin">LinkedIn</option>
+</select>
+</div>
+</div>
+<!-- Queue List -->
+<div class="flex flex-col gap-5">
+<!-- Card 1: Rascunho -->
+<article class="group bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-2xl p-6 shadow-sm hover:bg-white/80 transition-all duration-300 flex flex-col md:flex-row gap-5 items-start md:items-center">
+<!-- Icon/Format Indicator -->
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-secondary border border-secondary/10">
+<span class="material-symbols-outlined" data-icon="article">article</span>
+</div>
+<!-- Main Info -->
+<div class="flex-grow flex flex-col gap-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-surface-variant text-on-surface-variant">Blog</span>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-secondary-container text-on-secondary-container">Perfil: Tech B2B</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg md:text-[22px] md:leading-[28px] text-on-background">Estratégias de Cloud Computing para 2024</h2>
+<p class="font-label-sm text-label-sm text-secondary mt-1">Atualizado há 2 horas</p>
+</div>
+<!-- Status & Actions -->
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 mt-3 md:mt-0">
+<!-- Badge: Rascunho -->
+<div class="px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1.5 border border-secondary/10">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                        Rascunho
+                    </div>
+<div class="flex gap-2 items-center">
+<button class="font-label-md text-label-md text-secondary hover:text-primary hover:underline px-3 py-2.5 transition-colors">Duplicar</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2.5 rounded-xl hover:bg-surface-tint shadow-sm transition-all duration-200">Abrir</button>
+</div>
+</div>
+</article>
+<!-- Card 2: Gerado -->
+<article class="group bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-2xl p-6 shadow-sm hover:bg-white/80 transition-all duration-300 flex flex-col md:flex-row gap-5 items-start md:items-center">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-secondary border border-secondary/10">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+</div>
+<div class="flex-grow flex flex-col gap-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-surface-variant text-on-surface-variant">LinkedIn</span>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-secondary-container text-on-secondary-container">Perfil: Pessoal (CEO)</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg md:text-[22px] md:leading-[28px] text-on-background">Liderança em tempos de crise - Reflexões</h2>
+<p class="font-label-sm text-label-sm text-secondary mt-1">Atualizado há 45 min</p>
+</div>
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 mt-3 md:mt-0">
+<!-- Badge: Gerado -->
+<div class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm flex items-center gap-1.5 border border-secondary/10">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                        Gerado
+                    </div>
+<div class="flex gap-2 items-center">
+<button class="font-label-md text-label-md text-secondary hover:text-primary hover:underline px-3 py-2.5 transition-colors">Duplicar</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2.5 rounded-xl hover:bg-surface-tint shadow-sm transition-all duration-200">Abrir</button>
+</div>
+</div>
+</article>
+<!-- Card 3: Em Revisão -->
+<article class="group bg-white/60 backdrop-blur-2xl border border-secondary/30 rounded-2xl p-6 shadow-sm hover:bg-white/80 transition-all duration-300 flex flex-col md:flex-row gap-5 items-start md:items-center">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-secondary border border-secondary/10">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div class="flex-grow flex flex-col gap-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-surface-variant text-on-surface-variant">Newsletter</span>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-md bg-secondary-container text-on-secondary-container">Perfil: Dicas Dev</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg md:text-[22px] md:leading-[28px] text-on-background">5 Ferramentas para Produtividade Front-end</h2>
+<p class="font-label-sm text-label-sm text-secondary mt-1">Atualizado ontem</p>
+</div>
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 mt-3 md:mt-0">
+<!-- Badge: Em Revisão -->
+<div class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm flex items-center gap-1.5 border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        Em Revisão
+                    </div>
+<div class="flex gap-2 items-center">
+<button class="font-label-md text-label-md text-secondary hover:text-primary hover:underline px-3 py-2.5 transition-colors">Duplicar</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2.5 rounded-xl hover:bg-surface-tint shadow-sm transition-all duration-200">Abrir</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden bg-white/80 dark:bg-surface-container-highest/80 backdrop-blur-2xl border-t border-secondary/20 shadow-lg docked full-width bottom-0 rounded-t-2xl fixed left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-label-sm-mobile">Hoje</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-fixed/40 rounded-xl px-5 py-2 scale-95 transition-transform duration-150 shadow-sm" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="view_list" data-weight="fill">view_list</span>
+<span class="font-label-sm text-label-sm-mobile font-bold">Fila</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="record_voice_over">record_voice_over</span>
+<span class="font-label-sm text-label-sm-mobile">Perfis</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Novo</span>
+</a>
+</nav>
+</body></html>

@@ -1,13 +1,13 @@
 %%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
 flowchart LR
   subgraph APP["Aplicacao"]
-    UI["UI<br/>pages: /, login, profiles, texts<br/>components/*"]
+    UI["UI<br/>pages: / (Hoje), /texts (Biblioteca), /texts/new (Novo texto), /texts/[id], /profiles, /login<br/>components/*"]
     SV["App server<br/>actions, api, app-context<br/>data, generation, proxy"]
     JOB["Jobs<br/>nao ha fila dedicada"]
   end
 
   subgraph EXT["Servicos externos"]
-    AUTH["Supabase Auth<br/>magic link + sessao"]
+    AUTH["Supabase Auth<br/>email + senha + sessao"]
     DB[("Supabase Postgres<br/>profiles, texts, text_versions<br/>channel_presets")]
     AI["OpenAI API<br/>generateObject + prompt fixo"]
   end

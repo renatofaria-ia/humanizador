@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Workspace do Texto - Humanizador</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#f9f9ff",
+                        "surface-tint": "#a03f30",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-fixed": "#cce5ff",
+                        "surface-container": "#e8eeff",
+                        "on-primary-fixed-variant": "#80281b",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#7a7371",
+                        "on-background": "#161c27",
+                        "primary-container": "#bd5444",
+                        "on-primary-fixed": "#400200",
+                        "tertiary-fixed-dim": "#cdc5c2",
+                        "on-secondary-fixed-variant": "#31495e",
+                        "surface-dim": "#d4daea",
+                        "tertiary": "#615b59",
+                        "inverse-surface": "#2a303d",
+                        "on-secondary-fixed": "#011d31",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#56423e",
+                        "surface-variant": "#dde2f3",
+                        "secondary-container": "#c9e2fd",
+                        "on-secondary-container": "#4d657b",
+                        "surface-container-high": "#e3e8f9",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "secondary": "#496177",
+                        "on-primary": "#ffffff",
+                        "outline": "#89726d",
+                        "inverse-on-surface": "#ecf0ff",
+                        "surface": "#f9f9ff",
+                        "on-tertiary-fixed-variant": "#4b4644",
+                        "outline-variant": "#ddc0bb",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#ffb4a7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "primary": "#9d3d2e",
+                        "inverse-primary": "#ffb4a7",
+                        "surface-container-highest": "#dde2f3",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed": "#eae0de",
+                        "on-surface": "#161c27",
+                        "primary-fixed": "#ffdad4",
+                        "on-tertiary-fixed": "#1f1b19"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px"
+                    },
+                    fontFamily: {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    fontSize: {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Glassmorphism utility */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(73, 97, 119, 0.15); /* Slate Blue 15% */
+        }
+        
+        .glass-float {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(74, 98, 120, 0.12);
+            border: 1px solid rgba(73, 97, 119, 0.15);
+        }
+
+        /* Ambient background gradient */
+        body {
+            background: linear-gradient(135deg, #f9f9ff 0%, #e8eeff 100%);
+            background-attachment: fixed;
+        }
+
+        .editor-content:empty:before {
+            content: attr(data-placeholder);
+            color: #89726d;
+            pointer-events: none;
+            display: block; /* For Firefox */
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col font-body-md antialiased">
+<!-- Workspace Header (Task-focused, so main nav is suppressed) -->
+<header class="glass-card sticky top-0 z-40 w-full">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-16 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button aria-label="Voltar" class="text-secondary hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Projeto Editorial</span>
+<h1 class="font-label-md text-label-md text-on-background truncate max-w-[200px] md:max-w-md">Estratégia Q3 - Comunicação Interna</h1>
+</div>
+<!-- Status Badge -->
+<span class="ml-2 px-2 py-1 rounded-full bg-primary-fixed/30 text-primary font-label-sm text-label-sm border border-primary-fixed-dim/50">
+                    Em Revisão
+                </span>
+</div>
+<div class="flex items-center gap-3">
+<button class="hidden md:flex items-center text-secondary font-label-md text-label-md hover:underline px-2 py-1 transition-colors">
+                    Salvar Rascunho
+                </button>
+<button class="glass-float flex items-center justify-center text-secondary font-label-md text-label-md px-4 py-2 rounded-full hover:text-primary hover:border-primary transition-colors">
+<span class="material-symbols-outlined mr-2 text-[18px]">refresh</span>
+                    Regerar Trecho
+                </button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-full hover:bg-on-primary-fixed-variant transition-colors shadow-sm flex items-center">
+<span class="material-symbols-outlined mr-2 text-[18px]">check_circle</span>
+                    Aprovar Versão
+                </button>
+</div>
+</div>
+<!-- Tabs -->
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex gap-6 border-t border-secondary/10">
+<button class="py-3 text-secondary font-label-md text-label-md hover:text-primary transition-colors">Base</button>
+<button class="py-3 text-primary font-label-md text-label-md border-b-2 border-primary">Texto Final</button>
+<button class="py-3 text-secondary font-label-md text-label-md hover:text-primary transition-colors">Publicação</button>
+<button class="py-3 text-secondary font-label-md text-label-md hover:text-primary transition-colors">Histórico</button>
+</div>
+</header>
+<!-- Main Workspace Layout -->
+<main class="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-gutter flex flex-col lg:flex-row gap-gutter items-start">
+<!-- Editor Area (Max 800px for reading comfort) -->
+<div class="flex-grow flex flex-col gap-6">
+<!-- Comparison Controls -->
+<div class="flex items-center justify-between bg-surface-container-low/50 p-3 rounded-xl border border-secondary/10">
+<div class="flex gap-2">
+<div class="flex items-center bg-error-container text-error font-label-sm text-label-sm px-3 py-1.5 rounded-full border border-error/20">
+<span class="material-symbols-outlined text-[14px] mr-1">warning</span>
+                Repetição excessiva detectada
+            </div>
+<div class="flex items-center bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-3 py-1.5 rounded-full border border-secondary-fixed-dim/30">
+<span class="material-symbols-outlined text-[14px] mr-1">tune</span>
+                Tom calibrado
+            </div>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-secondary uppercase tracking-wider">Comparar Alterações</span>
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none">
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+</button>
+</div>
+</div>
+<!-- Side-by-Side Workspace -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Left: Texto Base -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<span class="font-label-md text-secondary uppercase tracking-widest">Texto Base</span>
+<span class="text-label-sm text-secondary/60">Somente leitura</span>
+</div>
+<div class="glass-card rounded-xl p-6 md:p-8 min-h-[500px] opacity-70">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">A Evolução da Comunicação Assíncrona</h2>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-6">
+<p>No ambiente corporativo moderno, a dependência de reuniões síncronas tem se mostrado um gargalo significativo para a produtividade e o bem-estar das equipes. O excesso de chamadas de vídeo não apenas fragmenta o foco, mas também contribui para o esgotamento cognitivo conhecido como 'zoom fatigue'.</p>
+<p>A transição para modelos de comunicação assíncrona — onde a informação é compartilhada sem a expectativa de uma resposta imediata — permite que os colaboradores gerenciem seu tempo de forma mais autônoma e eficiente.</p>
+</div>
+</div>
+</div>
+<!-- Right: Versão Humanizada -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<span class="font-label-md text-primary uppercase tracking-widest">Versão Humanizada</span>
+<div class="flex gap-2">
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined text-[18px]">history</span></button>
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined text-[18px]">fullscreen</span></button>
+</div>
+</div>
+<div class="glass-card rounded-xl p-6 md:p-8 min-h-[500px] border-primary/20 relative group cursor-text">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6 outline-none" contenteditable="true">A Evolução da Comunicação Assíncrona</h2>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-6 outline-none editor-content" contenteditable="true">
+<p>No ambiente corporativo moderno, a dependência de reuniões síncronas tem se mostrado um gargalo significativo para a produtividade e o bem-estar das equipes. O excesso de chamadas de vídeo não apenas fragmenta o foco, mas também contribui para o esgotamento cognitivo conhecido como 'zoom fatigue'.</p>
+<p>A transição para modelos de comunicação assíncrona — onde a informação é compartilhada sem a expectativa de uma resposta imediata — permite que os colaboradores gerenciem seu tempo de forma mais autônoma e eficiente. <span class="bg-secondary-fixed/40 border-b border-secondary/30">Ferramentas como documentos compartilhados e atualizações em vídeo tornam-se essenciais.</span></p>
+<p>No entanto, o sucesso dessa abordagem requer uma cultura organizacional baseada na confiança. <span class="bg-error-container/40 border-b border-error/50 cursor-pointer">É essencial que a cultura organizacional seja essencialmente baseada</span> na clareza escrita.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar: Notes & Summary (Collapses to bottom sheet or hides on mobile) -->
+<aside class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-unit hidden lg:flex">
+<div class="glass-card rounded-xl p-6 flex flex-col gap-4">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest flex items-center border-b border-secondary/15 pb-2">
+<span class="material-symbols-outlined text-[16px] mr-2">history_edu</span>
+                    Resumo de Alterações
+                </h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<div class="mt-0.5 bg-primary-fixed rounded-full p-1 text-primary">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Tom ajustado para "Profissional Empático"</p>
+<p class="font-body-sm text-body-sm text-secondary text-[12px] mt-1">Substituiu jargões por termos mais acessíveis no segundo parágrafo.</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-0.5 bg-secondary-fixed rounded-full p-1 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[14px]">compress</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Redução de redundância</p>
+<p class="font-body-sm text-body-sm text-secondary text-[12px] mt-1">Cortou 45 palavras mantendo a essência do argumento inicial.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="glass-card rounded-xl p-6 flex flex-col gap-4 flex-grow">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest flex items-center border-b border-secondary/15 pb-2">
+<span class="material-symbols-outlined text-[16px] mr-2">edit_note</span>
+                    Notas e Lembretes
+                </h3>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/30 text-body-sm text-on-surface-variant font-body-sm relative group">
+                    Garantir que a conclusão mencione as novas ferramentas implementadas no Q2.
+                    <button class="absolute top-2 right-2 text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<textarea class="w-full bg-surface-container-lowest border border-secondary/20 rounded-lg p-3 font-body-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none min-h-[100px]" placeholder="Adicionar nota..."></textarea>
+</div>
+</aside>
+</main>
+</body></html>

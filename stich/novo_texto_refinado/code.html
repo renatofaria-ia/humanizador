@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Novo Texto - Humanizador</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#f9f9ff",
+                    "surface-tint": "#a03f30",
+                    "surface-container-low": "#f1f3ff",
+                    "secondary-fixed": "#cce5ff",
+                    "surface-container": "#e8eeff",
+                    "on-primary-fixed-variant": "#80281b",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f9f9ff",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#7a7371",
+                    "on-background": "#161c27",
+                    "primary-container": "#bd5444",
+                    "on-primary-fixed": "#400200",
+                    "tertiary-fixed-dim": "#cdc5c2",
+                    "on-secondary-fixed-variant": "#31495e",
+                    "surface-dim": "#d4daea",
+                    "tertiary": "#615b59",
+                    "inverse-surface": "#2a303d",
+                    "on-secondary-fixed": "#011d31",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#56423e",
+                    "surface-variant": "#dde2f3",
+                    "secondary-container": "#c9e2fd",
+                    "on-secondary-container": "#4d657b",
+                    "surface-container-high": "#e3e8f9",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "secondary": "#496177",
+                    "on-primary": "#ffffff",
+                    "outline": "#89726d",
+                    "inverse-on-surface": "#ecf0ff",
+                    "surface": "#f9f9ff",
+                    "on-tertiary-fixed-variant": "#4b4644",
+                    "outline-variant": "#ddc0bb",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4a7",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "primary": "#9d3d2e",
+                    "inverse-primary": "#ffb4a7",
+                    "surface-container-highest": "#dde2f3",
+                    "on-primary-container": "#fffbff",
+                    "tertiary-fixed": "#eae0de",
+                    "on-surface": "#161c27",
+                    "primary-fixed": "#ffdad4",
+                    "on-tertiary-fixed": "#1f1b19"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "unit": "8px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "40px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-xl-mobile": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-xl": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-md": [
+                            "13px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-xl-mobile": [
+                            "30px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.03em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "26px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-xl": [
+                            "40px",
+                            {
+                                    "lineHeight": "48px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #f9f9ff 0%, #e8eeff 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-sm bg-background pb-24 md:pb-0">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop h-16 max-w-container-max mx-auto bg-white/85 dark:bg-surface-container/85 backdrop-blur-xl docked full-width top-0 border-b border-secondary/15 flat no shadows sticky z-50">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">Humanizador</div>
+<nav class="flex gap-gutter">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-16" href="#">Hoje</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-16" href="#">Fila</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md flex items-center h-16" href="#">Perfis</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-200 opacity-80 transition-opacity font-label-md text-label-md flex items-center h-16 mt-1" href="#">Novo texto</a>
+</nav>
+<div class="flex gap-unit items-center text-primary">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden ml-2 border border-secondary/20">
+<img alt="Foto de perfil do editor" class="w-full h-full object-cover" data-alt="A close up portrait of a professional editor in a well lit studio setting. Warm lighting, modern aesthetic. High quality, detailed facial features. The overall tone is calm and focused." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkPGUJoPT32dNotWqiyIkXfWuXdpJP3_RbJo0Zdb_ZzoSoYp8Fs-dlxsT2G_AhIEOT2bqk_Mk4LZwt_GwMdFg-eEO9cGdizPmsMq-gqENJHJ1__Bn6ZFFsEiWJ1LJD4Q6VHPD0Xro9tluZYL0ZsBf8fGWTJhQIr_Bt7eJ8yP_dLtWHTAmxydI1jgziYxzvSBX3wT_2tKiYBuOGIKLxluFEyKu6OlPv3ibEAAiqvogOu8W_RTCOhARMj_KWRO0Hj-m4x0WAyPm-iq8"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-gutter grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+<!-- Checklist Lateral -->
+<aside class="hidden md:block col-span-3 sticky top-[100px]">
+<div class="bg-white/85 backdrop-blur-md border border-secondary/15 rounded-xl p-gutter shadow-sm">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-6">Progresso</h3>
+<ol class="relative border-l border-secondary/20 ml-3">
+<li class="mb-8 ml-6">
+<span class="absolute flex items-center justify-center w-6 h-6 bg-primary rounded-full -left-3 ring-4 ring-white">
+<span class="material-symbols-outlined text-white text-[14px]">edit_document</span>
+</span>
+<h3 class="font-label-md text-label-md text-primary font-bold">1. Dados Base</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Defina o conteúdo inicial</p>
+</li>
+<li class="mb-8 ml-6">
+<span class="absolute flex items-center justify-center w-6 h-6 bg-surface-variant rounded-full -left-3 ring-4 ring-white">
+<span class="material-symbols-outlined text-secondary text-[14px]">format_list_bulleted</span>
+</span>
+<h3 class="font-label-md text-label-md text-secondary">2. Formatos</h3>
+<p class="font-body-sm text-body-sm text-tertiary mt-1">Escolha os destinos</p>
+</li>
+<li class="ml-6">
+<span class="absolute flex items-center justify-center w-6 h-6 bg-surface-variant rounded-full -left-3 ring-4 ring-white">
+<span class="material-symbols-outlined text-secondary text-[14px]">tune</span>
+</span>
+<h3 class="font-label-md text-label-md text-secondary">3. Ajustes Finos</h3>
+<p class="font-body-sm text-body-sm text-tertiary mt-1">Personalize o tom</p>
+</li>
+</ol>
+</div>
+</aside>
+<!-- Formulário Central -->
+<div class="col-span-1 md:col-span-9 w-full max-w-[800px] mx-auto space-y-gutter">
+<!-- Mobile Stepper -->
+<div class="md:hidden flex justify-between items-center mb-6 px-2">
+<div class="flex items-center text-primary">
+<span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold mr-2">1</span>
+<span class="font-label-md text-label-md font-bold">Dados Base</span>
+</div>
+<div class="h-[1px] w-8 bg-secondary/20"></div>
+<div class="flex items-center text-secondary opacity-50">
+<span class="w-6 h-6 bg-surface-variant text-secondary rounded-full flex items-center justify-center text-xs font-bold mr-2">2</span>
+</div>
+<div class="h-[1px] w-8 bg-secondary/20"></div>
+<div class="flex items-center text-secondary opacity-50">
+<span class="w-6 h-6 bg-surface-variant text-secondary rounded-full flex items-center justify-center text-xs font-bold mr-2">3</span>
+</div>
+</div>
+<!-- Grupo 1: Dados Base -->
+<section class="bg-white/85 backdrop-blur-md border border-secondary/15 rounded-xl p-6 md:p-8 shadow-sm">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-6 border-b border-secondary/10 pb-4">Dados Base</h2>
+<div class="space-y-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="nome-interno">Nome Interno</label>
+<input class="w-full bg-white/50 border border-secondary/20 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors font-body-md text-body-md" id="nome-interno" placeholder="Ex: Lançamento Produto X" type="text"/>
+<p class="font-body-sm text-body-sm text-tertiary mt-2">Um nome para você identificar este texto na fila.</p>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="perfil">Perfil de Voz</label>
+<select class="w-full bg-white/50 border border-secondary/20 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors font-body-md text-body-md appearance-none" id="perfil">
+<option value="">Selecione um perfil...</option>
+<option value="1">CEO - Visão Estratégica</option>
+<option value="2">Tech Lead - Técnico e Direto</option>
+<option value="3">Marketing - Engajador</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2" for="texto-base">Texto Base</label>
+<textarea class="w-full bg-white/50 border border-secondary/20 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors font-body-md text-body-md resize-y" id="texto-base" placeholder="Cole aqui seu rascunho, anotações ou texto gerado por IA para ser humanizado..." rows="8"></textarea>
+</div>
+</div>
+</section>
+<!-- Grupo 2: Formatos -->
+<section class="bg-white/85 backdrop-blur-md border border-secondary/15 rounded-xl p-6 md:p-8 shadow-sm opacity-50 pointer-events-none transition-opacity duration-300" id="section-formatos">
+<div class="flex items-center justify-between mb-6 border-b border-secondary/10 pb-4">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Formatos</h2>
+<span class="bg-surface-variant text-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">Passo 2</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<label class="flex items-start space-x-3 p-4 border border-secondary/20 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input class="mt-1 text-primary focus:ring-primary rounded border-secondary/30 bg-white/50 w-5 h-5" type="checkbox"/>
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Artigo de Blog</span>
+<span class="block font-body-sm text-body-sm text-tertiary mt-1">Formato longo, SEO otimizado.</span>
+</div>
+</label>
+<label class="flex items-start space-x-3 p-4 border border-secondary/20 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input class="mt-1 text-primary focus:ring-primary rounded border-secondary/30 bg-white/50 w-5 h-5" type="checkbox"/>
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Post LinkedIn</span>
+<span class="block font-body-sm text-body-sm text-tertiary mt-1">Profissional, focado em networking.</span>
+</div>
+</label>
+<label class="flex items-start space-x-3 p-4 border border-secondary/20 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input class="mt-1 text-primary focus:ring-primary rounded border-secondary/30 bg-white/50 w-5 h-5" type="checkbox"/>
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Thread no X</span>
+<span class="block font-body-sm text-body-sm text-tertiary mt-1">Curto, opinativo, em sequência.</span>
+</div>
+</label>
+<label class="flex items-start space-x-3 p-4 border border-secondary/20 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input class="mt-1 text-primary focus:ring-primary rounded border-secondary/30 bg-white/50 w-5 h-5" type="checkbox"/>
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Newsletter</span>
+<span class="block font-body-sm text-body-sm text-tertiary mt-1">Conversacional e direto na caixa de entrada.</span>
+</div>
+</label>
+</div>
+</section>
+<!-- Grupo 3: Ajustes Finos -->
+<section class="bg-white/85 backdrop-blur-md border border-secondary/15 rounded-xl p-6 md:p-8 shadow-sm opacity-50 pointer-events-none transition-opacity duration-300" id="section-ajustes">
+<div class="flex items-center justify-between mb-6 border-b border-secondary/10 pb-4">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Ajustes Finos</h2>
+<span class="bg-surface-variant text-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">Passo 3</span>
+</div>
+<div class="space-y-8">
+<!-- Sliders -->
+<div class="space-y-6">
+<div>
+<div class="flex justify-between mb-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Ousadia</label>
+<span class="font-body-sm text-body-sm text-tertiary">Equilibrado</span>
+</div>
+<input class="w-full h-2 bg-secondary-fixed-dim rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="1" type="range" value="50"/>
+<div class="flex justify-between mt-1 font-label-sm text-label-sm text-tertiary">
+<span>Conservador</span>
+<span>Provocativo</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Formalidade</label>
+<span class="font-body-sm text-body-sm text-tertiary">Casual Profissional</span>
+</div>
+<input class="w-full h-2 bg-secondary-fixed-dim rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="1" type="range" value="40"/>
+<div class="flex justify-between mt-1 font-label-sm text-label-sm text-tertiary">
+<span>Descontraído</span>
+<span>Acadêmico</span>
+</div>
+</div>
+</div>
+<!-- Toggles -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-secondary/10">
+<label class="flex items-center justify-between cursor-pointer">
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Uso de Emojis</span>
+<span class="block font-body-sm text-body-sm text-tertiary">Permitir emojis no texto final</span>
+</div>
+<div class="relative">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-secondary-fixed-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer">
+<div>
+<span class="block font-label-md text-label-md text-on-surface">Primeira Pessoa</span>
+<span class="block font-body-sm text-body-sm text-tertiary">Escrever como "Eu/Nós"</span>
+</div>
+<div class="relative">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-secondary-fixed-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Ações -->
+<div class="pt-6 pb-12 flex justify-end">
+<button class="bg-primary text-white font-label-md text-label-md px-8 py-4 rounded-lg hover:bg-on-primary-fixed-variant transition-colors flex items-center space-x-2" type="button">
+<span>Gerar Primeira Sugestão</span>
+<span class="material-symbols-outlined text-[18px]">magic_button</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-white/95 dark:bg-surface-container-highest/95 backdrop-blur-md docked full-width bottom-0 rounded-t-xl border-t border-secondary/10 shadow-sm text-primary font-headline-xl-mobile text-headline-xl-mobile">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low font-label-sm text-label-sm-mobile w-full py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+            Hoje
+        </a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low font-label-sm text-label-sm-mobile w-full py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">view_list</span>
+            Fila
+        </a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low font-label-sm text-label-sm-mobile w-full py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">record_voice_over</span>
+            Perfis
+        </a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-fixed/30 rounded-full px-4 py-1 hover:bg-surface-container-low scale-95 transition-transform duration-150 font-label-sm text-label-sm-mobile" href="#">
+<span class="material-symbols-outlined mb-1">add_circle</span>
+            Novo
+        </a>
+</nav>
+<script>
+        // Simulação simples de progressão para demonstrar o fluxo (apenas UI)
+        document.getElementById('texto-base').addEventListener('input', function(e) {
+            if(e.target.value.length > 10) {
+                document.getElementById('section-formatos').classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                document.getElementById('section-formatos').classList.add('opacity-50', 'pointer-events-none');
+            }
+        });
+
+        const checkboxes = document.querySelectorAll('#section-formatos input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const anyChecked = Array.from(checkboxes).some(c => c.checked);
+                if(anyChecked) {
+                    document.getElementById('section-ajustes').classList.remove('opacity-50', 'pointer-events-none');
+                } else {
+                    document.getElementById('section-ajustes').classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+        });
+    </script>
+</body></html>

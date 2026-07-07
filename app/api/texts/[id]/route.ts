@@ -44,6 +44,8 @@ export async function PATCH(
         primeiraPessoa: Boolean(controls.primeiraPessoa),
         nivelOusadia: Number(controls.nivelOusadia ?? 3),
         instrucoesExtras: String(controls.instrucoesExtras ?? ""),
+        modoOperacao: (controls.modoOperacao ?? "completo") as TextControls["modoOperacao"],
+        presetDeVoz: (controls.presetDeVoz ?? "auto") as TextControls["presetDeVoz"],
       },
     });
 

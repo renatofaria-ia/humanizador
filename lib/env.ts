@@ -12,7 +12,6 @@ export function getAppEnv() {
     supabaseAnonKey,
     supabaseClientKey,
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? inferredSiteUrl,
-    ownerEmail: process.env.APP_OWNER_EMAIL ?? "",
     openAiApiKey: process.env.OPENAI_API_KEY ?? "",
   };
 
@@ -20,8 +19,6 @@ export function getAppEnv() {
     ...env,
     hasSupabase: Boolean(env.supabaseUrl && env.supabaseClientKey),
     hasOpenAi: Boolean(env.openAiApiKey),
-    isConfigured: Boolean(
-      env.supabaseUrl && env.supabaseClientKey && env.openAiApiKey && env.ownerEmail,
-    ),
+    isConfigured: Boolean(env.supabaseUrl && env.supabaseClientKey && env.openAiApiKey),
   };
 }

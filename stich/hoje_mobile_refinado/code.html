@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Humanizador - Hoje</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f9f9ff",
+                        "surface-tint": "#a03f30",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-fixed": "#cce5ff",
+                        "surface-container": "#e8eeff",
+                        "on-primary-fixed-variant": "#80281b",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#7a7371",
+                        "on-background": "#161c27",
+                        "primary-container": "#bd5444",
+                        "on-primary-fixed": "#400200",
+                        "tertiary-fixed-dim": "#cdc5c2",
+                        "on-secondary-fixed-variant": "#31495e",
+                        "surface-dim": "#d4daea",
+                        "tertiary": "#615b59",
+                        "inverse-surface": "#2a303d",
+                        "on-secondary-fixed": "#011d31",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#56423e",
+                        "surface-variant": "#dde2f3",
+                        "secondary-container": "#c9e2fd",
+                        "on-secondary-container": "#4d657b",
+                        "surface-container-high": "#e3e8f9",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "secondary": "#496177",
+                        "on-primary": "#ffffff",
+                        "outline": "#89726d",
+                        "inverse-on-surface": "#ecf0ff",
+                        "surface": "#f9f9ff",
+                        "on-tertiary-fixed-variant": "#4b4644",
+                        "outline-variant": "#ddc0bb",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#ffb4a7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "primary": "#9d3d2e",
+                        "inverse-primary": "#ffb4a7",
+                        "surface-container-highest": "#dde2f3",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed": "#eae0de",
+                        "on-surface": "#161c27",
+                        "primary-fixed": "#ffdad4",
+                        "on-tertiary-fixed": "#1f1b19"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #fcedeb 0%, #dde8f5 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="text-on-background pb-[96px]">
+<!-- TopNav - Mobile Hidden Nav Links, Logo + Avatar Only -->
+<header class="fixed top-0 left-0 w-full z-50 bg-white/60 dark:bg-surface-container/60 backdrop-blur-xl border-b border-white/20 h-16 flex justify-between items-center px-margin-mobile">
+<div class="font-headline-lg font-bold text-primary dark:text-primary-fixed">Humanizador</div>
+<div class="flex items-center gap-4">
+<button class="text-secondary hover:text-primary transition-colors duration-200 material-symbols-outlined" data-icon="notifications">notifications</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-secondary/20">
+<img alt="Foto de perfil do editor" class="w-full h-full object-cover" data-alt="A close up professional headshot of an editor. The lighting is soft and flattering, suitable for a corporate or creative workspace environment. The mood is calm and focused, with a bright, light-mode background gradient of soft peach and pale blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr-7S-GOVVn1fq8eUhuz49h4IjzUFN4dMzSIFKmqAZ6KN813iO_GDzOblQ_t7RgehpGk0RCacBbaMTxSPit_h7yy-P9jXiqbsYiXZkmVErjTLrdP7ZXdMx6LScH3rc80OcoCF-y7A8UCfjWa5K0NS8V53TBsROP1UXBtmB3EvZQ48y4rbdQSTFyQQQ7458xXRFDHFjaTgMHK2pZPkt9k-Hoq_Y1EteIK4U0u4Fpez55b1UaE3m6QNFxsBREH-PFU5lg_grc96wE4Q"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile space-y-6 max-w-container-max mx-auto">
+<!-- Ação Prioritária (Bento Item 1) -->
+<section>
+<h2 class="font-label-md text-label-md text-secondary mb-3 uppercase tracking-wider">Ação Prioritária</h2>
+<div class="glass-card rounded-2xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Revisão Pendente</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">2 textos aguardam sua aprovação final antes da publicação.</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
+<button class="bg-[#A03F30] text-white font-label-md text-label-md py-3 px-6 rounded-xl w-full text-center hover:bg-on-primary-fixed-variant transition-colors shadow-sm">
+                    Revisar Agora
+                </button>
+</div>
+</section>
+<!-- Métricas (Grid 2x2) -->
+<section>
+<h2 class="font-label-md text-label-md text-secondary mb-3 uppercase tracking-wider">Resumo do Dia</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-card rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+<span class="material-symbols-outlined text-[#4A6278] mb-2" data-icon="edit_document">edit_document</span>
+<span class="font-headline-xl-mobile text-headline-xl-mobile text-[#161c27]">14</span>
+<span class="font-body-sm text-body-sm text-[#56423e]">Gerados</span>
+</div>
+<div class="glass-card rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+<span class="material-symbols-outlined text-[#A03F30] mb-2" data-icon="rate_review">rate_review</span>
+<span class="font-headline-xl-mobile text-headline-xl-mobile text-[#161c27]">02</span>
+<span class="font-body-sm text-body-sm text-[#56423e]">Em Revisão</span>
+</div>
+<div class="glass-card rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+<span class="material-symbols-outlined text-[#4A6278] mb-2" data-icon="check_circle">check_circle</span>
+<span class="font-headline-xl-mobile text-headline-xl-mobile text-[#161c27]">08</span>
+<span class="font-body-sm text-body-sm text-[#56423e]">Aprovados</span>
+</div>
+<div class="glass-card rounded-2xl p-5 flex flex-col justify-between min-h-[120px]">
+<span class="material-symbols-outlined text-[#615b59] mb-2" data-icon="publish">publish</span>
+<span class="font-headline-xl-mobile text-headline-xl-mobile text-[#161c27]">05</span>
+<span class="font-body-sm text-body-sm text-[#56423e]">Publicados</span>
+</div>
+</div>
+</section>
+<!-- Textos Recentes (Simplified List) -->
+<section>
+<div class="flex justify-between items-center mb-3">
+<h2 class="font-label-md text-label-md text-secondary uppercase tracking-wider">Textos Recentes</h2>
+<button class="font-label-sm text-label-sm text-[#A03F30] underline">Ver todos</button>
+</div>
+<div class="space-y-3">
+<!-- Item 1 -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex-1 min-w-0 pr-4">
+<h4 class="font-body-md text-body-md text-on-surface truncate mb-1">Estratégias de Engajamento 2024</h4>
+<div class="flex items-center gap-2">
+<span class="inline-block px-2 py-1 bg-[#F5E6E3] text-[#A03F30] font-label-sm text-label-sm rounded-md">Em Revisão</span>
+<span class="font-label-sm text-label-sm text-secondary">Hoje, 10:45</span>
+</div>
+</div>
+<button class="text-secondary material-symbols-outlined" data-icon="chevron_right">chevron_right</button>
+</div>
+<!-- Item 2 -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex-1 min-w-0 pr-4">
+<h4 class="font-body-md text-body-md text-on-surface truncate mb-1">Campanha de Lançamento Q3</h4>
+<div class="flex items-center gap-2">
+<span class="inline-block px-2 py-1 bg-[#E8F0FE] text-[#4A6278] font-label-sm text-label-sm rounded-md">Gerado</span>
+<span class="font-label-sm text-label-sm text-secondary">Hoje, 09:12</span>
+</div>
+</div>
+<button class="text-secondary material-symbols-outlined" data-icon="chevron_right">chevron_right</button>
+</div>
+<!-- Item 3 -->
+<div class="glass-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex-1 min-w-0 pr-4">
+<h4 class="font-body-md text-body-md text-on-surface truncate mb-1">Artigo Blog: IA no Trabalho</h4>
+<div class="flex items-center gap-2">
+<span class="inline-block px-2 py-1 bg-[#E6F4EA] text-[#1E8E3E] font-label-sm text-label-sm rounded-md">Aprovado</span>
+<span class="font-label-sm text-label-sm text-secondary">Ontem</span>
+</div>
+</div>
+<button class="text-secondary material-symbols-outlined" data-icon="chevron_right">chevron_right</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-white/80 dark:bg-surface-container-highest/95 backdrop-blur-xl border-t border-white/20 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] rounded-t-3xl h-[88px] pb-6">
+<!-- Hoje (Active) -->
+<a class="flex flex-col items-center justify-center text-[#A03F30] px-4 py-1" href="#">
+<div class="bg-[#F5E6E3] rounded-full w-16 h-8 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[20px]" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+</div>
+<span class="font-label-sm text-[10px] font-semibold">Hoje</span>
+</a>
+<!-- Fila -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="view_list">view_list</span>
+<span class="font-label-sm text-[10px] font-medium">Fila</span>
+</a>
+<!-- Perfis -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="record_voice_over">record_voice_over</span>
+<span class="font-label-sm text-[10px] font-medium">Perfis</span>
+</a>
+<!-- Novo -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-[10px] font-medium">Novo</span>
+</a>
+</nav>
+</body></html>

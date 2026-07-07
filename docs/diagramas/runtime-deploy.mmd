@@ -3,11 +3,11 @@ flowchart LR
   B["Browser"] --> UI
 
   subgraph V["Vercel / Next.js 16 App Router"]
-    UI["UI pages<br/>/, login, profiles, texts"]
+    UI["UI pages<br/>/, /texts (Biblioteca), /texts/new (Novo texto), /texts/[id], /profiles, /login<br/>DashboardShell route-aware + mobile nav fixa"]
     SA["Actions + API<br/>actions.ts, app/api/*"]
-    AH["Auth helpers<br/>proxy, callback, supabase/*"]
+    AH["Auth helpers<br/>proxy, supabase/*"]
     LD["Domain libs<br/>data, generation, protocol"]
-    ENV["Env<br/>Supabase keys, OpenAI key, owner email"]
+    ENV["Env<br/>Supabase keys, OpenAI key"]
   end
 
   SA --> AH

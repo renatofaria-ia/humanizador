@@ -1,21 +1,34 @@
 %%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
 flowchart LR
+  ACC["Acesso ao app<br/>getAppAccess() / requireReadyUser()<br/>setup | login-required | ready"] --> SHELL["DashboardShell<br/>Hoje | Textos | Perfis | Novo<br/>nav mobile fixa + CTA"] --> LIB
+
   subgraph CRI["Criacao"]
-    N1["Novo job"] --> N2["createTextBundle"] --> N3["texts<br/>1 bundle = N canais"] --> N4["/texts/[id]"]
+    LIB["/texts<br/>Biblioteca<br/>resumo com outputs gerados<br/>expandido com formatos + versoes"] -. abre .-> N4["/texts/[id]<br/>abas: base, texto final, publicacao, historico"]
+    N1["/texts/new<br/>aba Textos > Novo texto<br/>base + formatos + ajustes"] --> N2["createTextBundle<br/>source_bundle_id compartilhado"] --> N3["texts<br/>1 bundle = N formatos"] --> N4
     N3 -.-> N5["duplicateText"]
     N3 -.-> N6["createAdditionalOutputs"]
   end
 
   subgraph GER["Geracao"]
-    N4 --> N7["generateVersionForText"] --> N8["generateHumanizedOutput"] --> N9["OpenAI generateObject"] --> N10["text_versions<br/>source = llm"]
+    N4 --> N7["generateVersionForText<br/>usa modo_operacao + preset_de_voz"] --> N8["generateHumanizedOutput<br/>resolve preset + score"] --> N9["OpenAI generateObject"] --> N10["text_versions<br/>source = llm<br/>payload v2 em json"]
     N8 -.-> ERR["erro<br/>insertGenerationError()"]
   end
 
   subgraph POS["Pos-geracao"]
-    N10 --> N11["update text<br/>current_version_id + status"] --> R["revalidatePath()"] --> N12["Revisar"]
+    N10 --> N11["update text<br/>current_version_id + status"] --> R["revalidatePath() + redirect<br/>texto-final no sucesso<br/>historico no erro"] --> N12["Revisar texto final"]
+    LIB --> N20["updateSharedBase<br/>edita texto base + ativo/inativo do bundle"]
+    LIB --> N21["generateTextFromLibraryAction<br/>perfil + ajustes antes da 1a geracao"]
+    LIB --> N17["editar | aprovar | apagar | regerar<br/>por output e por versao"]
+    N21 --> N7
+    N17 -->|editar| N13["saveManualVersion<br/>nova versao manual + status escolhido"]
+    N17 -->|aprovar| N18["setCurrentTextVersion<br/>fixa a versao ativa"]
+    N17 -->|apagar| N19["softDeleteTextVersion<br/>oculta a versao sem apagar row"]
+    N17 -->|regerar| N21
     N12 -->|aprovar| N15["updateTextStatus"]
     N12 -->|arquivar| N16["Publicado / arquivado"]
     N12 --> N13["saveManualVersion"] --> N14["text_versions<br/>source = manual"] --> N15
     N13 -->|arquivar| N16
+    N18 --> N15
+    N19 --> N11
     N15 --> N16
   end

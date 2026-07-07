@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hoje - Humanizador App</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f9f9ff",
+                      "surface-tint": "#a03f30",
+                      "surface-container-low": "#f1f3ff",
+                      "secondary-fixed": "#cce5ff",
+                      "surface-container": "#e8eeff",
+                      "on-primary-fixed-variant": "#80281b",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#f9f9ff",
+                      "error": "#ba1a1a",
+                      "tertiary-container": "#7a7371",
+                      "on-background": "#161c27",
+                      "primary-container": "#bd5444",
+                      "on-primary-fixed": "#400200",
+                      "tertiary-fixed-dim": "#cdc5c2",
+                      "on-secondary-fixed-variant": "#31495e",
+                      "surface-dim": "#d4daea",
+                      "tertiary": "#615b59",
+                      "inverse-surface": "#2a303d",
+                      "on-secondary-fixed": "#011d31",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#56423e",
+                      "surface-variant": "#dde2f3",
+                      "secondary-container": "#c9e2fd",
+                      "on-secondary-container": "#4d657b",
+                      "surface-container-high": "#e3e8f9",
+                      "secondary-fixed-dim": "#b0c9e3",
+                      "secondary": "#496177",
+                      "on-primary": "#ffffff",
+                      "outline": "#89726d",
+                      "inverse-on-surface": "#ecf0ff",
+                      "surface": "#f9f9ff",
+                      "on-tertiary-fixed-variant": "#4b4644",
+                      "outline-variant": "#ddc0bb",
+                      "on-tertiary-container": "#fffbff",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#ffb4a7",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "primary": "#c05746",
+                      "inverse-primary": "#ffb4a7",
+                      "surface-container-highest": "#dde2f3",
+                      "on-primary-container": "#fffbff",
+                      "tertiary-fixed": "#eae0de",
+                      "on-surface": "#161c27",
+                      "primary-fixed": "#ffdad4",
+                      "on-tertiary-fixed": "#1f1b19"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "40px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-xl-mobile": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-xl": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-xl-mobile": [
+                              "30px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "0.03em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-xl": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #fdfbfb 0%, #f4f6fa 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(73, 97, 119, 0.12);
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03);
+        }
+        .status-draft { background-color: #f1f5f9; color: #475569; }
+        .status-generated { background-color: #e0f2fe; color: #0284c7; }
+        .status-review { background-color: #ffedd5; color: #c2410c; }
+        .status-approved { background-color: #dcfce7; color: #15803d; }
+      </style>
+</head>
+<body class="text-on-background font-body-md pb-24 md:pb-0">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-40 bg-white/95 dark:bg-surface-container/95 backdrop-blur-xl border-b border-secondary/10 hidden md:block shadow-sm">
+<div class="flex justify-between items-center w-full px-margin-desktop h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">
+                    Humanizador
+                </div>
+<nav class="flex gap-6 mt-1">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-label-md text-label-md" href="#">Hoje</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md pb-1" href="#">Fila</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md pb-1" href="#">Perfis</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200 font-label-md text-label-md pb-1" href="#">Novo texto</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-secondary hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="Foto de perfil do editor" class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm" data-alt="A small circular profile picture of an editor in a bright, modern studio. Soft minimalist lighting, professional and calm aesthetic. Light mode color palette with soft peach and blue tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJSUj28jQMrjs6UvyCygAgfaCVde_5aYv8sF8RlErYFdlo3qapMQarwFy0a-1MirnY9bQSR50wvx64IoDct2tb4FTCMsauBjtKevdJ3aKx9ZtO5VfcqhOFmXT8PB8eE-SUGCNBGF9jESdqdg2ejp2Wp55iDwiEZ-gBmqsRc5ujY21b127_vnsAwULE78KP_1Xk22nmz603Pk6vk2mRouoKWqOiJH78EAL5YLwdgU5gLLy_tXxswshNBRQphdvUP3UoqNK2b3XBuVY"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-6 md:pt-24 grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column / Main Workspace (Span 8) -->
+<div class="md:col-span-8 space-y-gutter">
+<!-- Priority Action -->
+<section class="glass-card rounded-xl p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+<div>
+<h2 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-3">Ação Prioritária</h2>
+<h3 class="font-headline-lg text-headline-lg text-on-background font-bold">Retomar: Guia de Sustentabilidade</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-2">Pendente de revisão de tom. Última edição há 2 horas.</p>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3.5 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors whitespace-nowrap shadow-sm font-semibold tracking-wide">
+                    Continuar Edição
+                </button>
+</section>
+<!-- Metrics -->
+<section class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+<div class="glass-card rounded-xl p-6 flex flex-col justify-center items-start">
+<span class="font-headline-xl text-headline-xl text-primary font-bold mb-1">12</span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Perfis Ativos</span>
+</div>
+<div class="glass-card rounded-xl p-6 flex flex-col justify-center items-start">
+<span class="font-headline-xl text-headline-xl text-primary font-bold mb-1">8</span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Textos em Andamento</span>
+</div>
+<div class="glass-card rounded-xl p-6 flex flex-col justify-center items-start">
+<span class="font-headline-xl text-headline-xl text-primary font-bold mb-1">145</span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Concluídos</span>
+</div>
+</section>
+<!-- Recent Texts -->
+<section class="glass-card rounded-xl p-8 overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-lg text-headline-lg text-on-background font-bold">Textos Recentes</h3>
+<button class="text-primary font-label-md text-label-md font-semibold hover:text-primary/80 transition-colors">Ver fila completa</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-secondary/15 font-label-sm text-label-sm text-secondary uppercase tracking-widest">
+<th class="pb-4 pl-2 font-semibold">Título</th>
+<th class="pb-4 font-semibold">Perfil</th>
+<th class="pb-4 font-semibold">Status</th>
+<th class="pb-4 font-semibold text-right pr-2">Última Alteração</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="border-b border-secondary/5 hover:bg-surface-container-low/30 transition-colors">
+<td class="py-5 pl-2 font-medium text-on-background">Anúncio Q3</td>
+<td class="py-5 text-secondary">CEO Visionário</td>
+<td class="py-5">
+<span class="status-review px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">Em Revisão</span>
+</td>
+<td class="py-5 text-right pr-2 text-secondary">Hoje, 09:30</td>
+</tr>
+<tr class="border-b border-secondary/5 hover:bg-surface-container-low/30 transition-colors">
+<td class="py-5 pl-2 font-medium text-on-background">Post Blog Dicas</td>
+<td class="py-5 text-secondary">Analista Empático</td>
+<td class="py-5">
+<span class="status-draft px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">Rascunho</span>
+</td>
+<td class="py-5 text-right pr-2 text-secondary">Ontem, 16:45</td>
+</tr>
+<tr class="border-b border-secondary/5 hover:bg-surface-container-low/30 transition-colors">
+<td class="py-5 pl-2 font-medium text-on-background">Email Mkt Especial</td>
+<td class="py-5 text-secondary">Marca Neutra</td>
+<td class="py-5">
+<span class="status-approved px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">Aprovado</span>
+</td>
+<td class="py-5 text-right pr-2 text-secondary">Ontem, 14:20</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors">
+<td class="py-5 pl-2 font-medium text-on-background">Release Produto X</td>
+<td class="py-5 text-secondary">Técnico Direto</td>
+<td class="py-5">
+<span class="status-generated px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">Gerado</span>
+</td>
+<td class="py-5 text-right pr-2 text-secondary">23 Mai, 11:10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column / Sidebar (Span 4) -->
+<div class="md:col-span-4 space-y-gutter">
+<!-- Suggested Profiles -->
+<section class="glass-card rounded-xl p-8">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-lg text-headline-lg text-on-background text-[22px] font-bold">Perfis Sugeridos</h3>
+<span class="material-symbols-outlined text-secondary/70" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="space-y-4">
+<button class="w-full flex items-center gap-4 p-4 rounded-xl border border-secondary/15 hover:border-primary/30 hover:bg-white transition-all text-left group">
+<div class="w-12 h-12 rounded-full bg-secondary-container/50 flex items-center justify-center text-secondary group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-background font-semibold text-sm">CEO Visionário</div>
+<div class="font-body-sm text-body-sm text-secondary text-xs mt-0.5">Inspirador, direto, focado no futuro</div>
+</div>
+</button>
+<button class="w-full flex items-center gap-4 p-4 rounded-xl border border-secondary/15 hover:border-primary/30 hover:bg-white transition-all text-left group">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-background font-semibold text-sm">Analista Empático</div>
+<div class="font-body-sm text-body-sm text-secondary text-xs mt-0.5">Acolhedor, didático, dados com calor</div>
+</div>
+</button>
+</div>
+</section>
+<!-- Recent Library -->
+<section class="glass-card rounded-xl p-8">
+<h3 class="font-headline-lg text-headline-lg text-on-background text-[22px] font-bold mb-6">Biblioteca Recente</h3>
+<ul class="space-y-5">
+<li>
+<a class="group flex items-start gap-4 p-2 -m-2 rounded-lg hover:bg-surface-container-low/50 transition-colors" href="#">
+<span class="material-symbols-outlined text-secondary/70 group-hover:text-primary transition-colors mt-0.5" data-icon="description">description</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-background group-hover:text-primary transition-colors">Campanha Inverno 2024</div>
+<div class="font-body-sm text-body-sm text-secondary text-xs mt-0.5">Publicado há 2 dias</div>
+</div>
+</a>
+</li>
+<li>
+<a class="group flex items-start gap-4 p-2 -m-2 rounded-lg hover:bg-surface-container-low/50 transition-colors" href="#">
+<span class="material-symbols-outlined text-secondary/70 group-hover:text-primary transition-colors mt-0.5" data-icon="description">description</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-background group-hover:text-primary transition-colors">Manifesto da Marca</div>
+<div class="font-body-sm text-body-sm text-secondary text-xs mt-0.5">Publicado há 5 dias</div>
+</div>
+</a>
+</li>
+<li>
+<a class="group flex items-start gap-4 p-2 -m-2 rounded-lg hover:bg-surface-container-low/50 transition-colors" href="#">
+<span class="material-symbols-outlined text-secondary/70 group-hover:text-primary transition-colors mt-0.5" data-icon="description">description</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-background group-hover:text-primary transition-colors">Newsletter Maio</div>
+<div class="font-body-sm text-body-sm text-secondary text-xs mt-0.5">Publicado há 1 semana</div>
+</div>
+</a>
+</li>
+</ul>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-white/95 dark:bg-surface-container-highest/95 backdrop-blur-md border-t border-secondary/10 shadow-sm rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-primary bg-primary/10 rounded-full px-4 py-1.5 scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-sm text-label-sm-mobile mt-1 font-semibold">Hoje</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1.5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="view_list">view_list</span>
+<span class="font-label-sm text-label-sm-mobile mt-1 font-medium">Fila</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1.5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="record_voice_over">record_voice_over</span>
+<span class="font-label-sm text-label-sm-mobile mt-1 font-medium">Perfis</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low px-4 py-1.5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile mt-1 font-medium">Novo</span>
+</button>
+</nav>
+</body></html>

@@ -41,6 +41,7 @@ create table if not exists public.texts (
   source_bundle_id uuid not null default gen_random_uuid(),
   title text not null,
   original_text text not null,
+  base_active boolean not null default true,
   profile_id uuid not null references public.profiles(id) on delete restrict,
   channel_key text not null references public.channel_presets(key) on delete restrict,
   status text not null default 'rascunho' check (status in ('rascunho', 'gerado', 'em_revisao', 'aprovado', 'publicado', 'arquivado')),
@@ -55,6 +56,8 @@ create table if not exists public.texts (
   primeira_pessoa boolean not null default true,
   nivel_ousadia integer not null default 3 check (nivel_ousadia between 1 and 5),
   instrucoes_extras text not null default '',
+  modo_operacao text not null default 'completo' check (modo_operacao in ('direto', 'completo', 'revisao')),
+  preset_de_voz text not null default 'auto' check (preset_de_voz in ('auto', 'neutro-base', 'corporativo-informal', 'jornalistico', 'didatico', 'post-social', 'cronica', 'academico', 'juridico', 'whatsapp')),
   published_url text null,
   published_at timestamptz null,
   created_at timestamptz not null default timezone('utc', now()),
@@ -63,6 +66,45 @@ create table if not exists public.texts (
 
 alter table public.texts
   add column if not exists source_bundle_id uuid not null default gen_random_uuid();
+
+alter table public.texts
+  add column if not exists base_active boolean not null default true;
+
+alter table public.texts
+  add column if not exists modo_operacao text not null default 'completo';
+
+alter table public.texts
+  add column if not exists preset_de_voz text not null default 'auto';
+
+do $$
+begin
+  if not exists (
+    select 1
+    from information_schema.table_constraints
+    where constraint_name = 'texts_modo_operacao_check'
+      and table_name = 'texts'
+  ) then
+    alter table public.texts
+      add constraint texts_modo_operacao_check
+      check (modo_operacao in ('direto', 'completo', 'revisao'));
+  end if;
+end
+$$;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from information_schema.table_constraints
+    where constraint_name = 'texts_preset_de_voz_check'
+      and table_name = 'texts'
+  ) then
+    alter table public.texts
+      add constraint texts_preset_de_voz_check
+      check (preset_de_voz in ('auto', 'neutro-base', 'corporativo-informal', 'jornalistico', 'didatico', 'post-social', 'cronica', 'academico', 'juridico', 'whatsapp'));
+  end if;
+end
+$$;
 
 create table if not exists public.text_versions (
   id uuid primary key default gen_random_uuid(),
@@ -79,9 +121,17 @@ create table if not exists public.text_versions (
   total_tokens integer null,
   duration_ms integer null,
   error text null,
+  deleted_at timestamptz null,
+  deleted_by uuid null references auth.users(id) on delete set null,
+  deleted_reason text null,
   created_at timestamptz not null default timezone('utc', now()),
   unique (text_id, version_number)
 );
+
+alter table public.text_versions
+  add column if not exists deleted_at timestamptz null,
+  add column if not exists deleted_by uuid null references auth.users(id) on delete set null,
+  add column if not exists deleted_reason text null;
 
 do $$
 begin

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Perfis - Humanizador</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-surface-variant": "#56423e",
+                "error-container": "#ffdad6",
+                "surface-dim": "#d4daea",
+                "secondary-fixed": "#cce5ff",
+                "primary-fixed-dim": "#ffb4a7",
+                "on-surface": "#161c27",
+                "surface-container": "#e8eeff",
+                "on-primary": "#ffffff",
+                "surface-bright": "#f9f9ff",
+                "on-secondary-fixed-variant": "#31495e",
+                "on-secondary": "#ffffff",
+                "primary-fixed": "#ffdad4",
+                "tertiary-fixed": "#eae0de",
+                "outline-variant": "#ddc0bb",
+                "primary": "#9d3d2e",
+                "surface": "#f9f9ff",
+                "secondary": "#496177",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed-variant": "#80281b",
+                "background": "#f9f9ff",
+                "on-tertiary-container": "#fffbff",
+                "on-error": "#ffffff",
+                "error": "#ba1a1a",
+                "primary-container": "#bd5444",
+                "tertiary": "#615b59",
+                "inverse-on-surface": "#ecf0ff",
+                "on-secondary-container": "#4d657b",
+                "tertiary-fixed-dim": "#cdc5c2",
+                "secondary-fixed-dim": "#b0c9e3",
+                "surface-variant": "#dde2f3",
+                "surface-container-highest": "#dde2f3",
+                "on-background": "#161c27",
+                "on-error-container": "#93000a",
+                "inverse-primary": "#ffb4a7",
+                "surface-container-low": "#f1f3ff",
+                "surface-container-high": "#e3e8f9",
+                "surface-tint": "#a03f30",
+                "on-secondary-fixed": "#011d31",
+                "on-tertiary-fixed-variant": "#4b4644",
+                "outline": "#89726d",
+                "tertiary-container": "#7a7371",
+                "on-primary-fixed": "#400200",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed": "#1f1b19",
+                "on-primary-container": "#fffbff",
+                "secondary-container": "#c9e2fd",
+                "inverse-surface": "#2a303d"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "unit": "8px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "container-max": "1280px",
+                "margin-desktop": "40px"
+        },
+        "fontFamily": {
+                "label-sm": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-xl": [
+                        "Inter"
+                ],
+                "headline-xl-mobile": [
+                        "Inter"
+                ],
+                "body-sm": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "label-sm": [
+                        "11px",
+                        {
+                                "lineHeight": "14px",
+                                "letterSpacing": "0.03em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "26px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-xl": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-xl-mobile": [
+                        "30px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "13px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body {
+            /* Peach to Blue subtle gradient base */
+            background: linear-gradient(135deg, #f9f9ff 0%, #f1f3ff 50%, #e8eeff 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(73, 97, 119, 0.15); /* Slate Blue / Secondary */
+        }
+        
+        .glass-float {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(74, 98, 120, 0.12);
+        }
+
+        .editorial-input {
+            padding: 16px;
+            border: 1px solid rgba(73, 97, 119, 0.2);
+            background-color: transparent;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .editorial-input:focus {
+            outline: none;
+            border-color: #9d3d2e; /* Primary Terracotta */
+            box-shadow: 0 0 0 1px #9d3d2e;
+        }
+
+        .expandable-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        
+        .expandable-content.expanded {
+            grid-template-rows: 1fr;
+        }
+        
+        .expandable-inner {
+            overflow: hidden;
+        }
+      </style>
+</head>
+<body class="text-on-background font-body-md antialiased pb-24 md:pb-0">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop h-16 max-w-container-max mx-auto bg-white/85 dark:bg-surface-container/85 backdrop-blur-xl border-b border-secondary/15 fixed top-0 left-0 right-0 z-50">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">
+            Humanizador
+        </div>
+<nav class="flex gap-8">
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200" href="#">Hoje</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200" href="#">Fila</a>
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 opacity-80 transition-opacity" href="#">Perfis</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary transition-colors duration-200" href="#">Novo texto</a>
+</nav>
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Foto de perfil do editor" class="w-8 h-8 rounded-full border border-secondary/20 object-cover" data-alt="A small circular avatar placeholder image. This image should just be a solid light grey circle or generic abstract silhouette suitable for a profile picture in a light-mode modern UI. Neutral tones, soft focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7bejv828RjBWrI6xNcZL5zry7sGpKE-6AQh_nHHh_xFd4LOLRhCHCFEybMTQ7yna98l-0QGSRcfC3CZIuMt306cVhvn3xIIj2O95AIET75nv4twuDXnxqbaId-8Wnpg3_FRfU4iq9sUvXHekdsEA_UD0kHrKDkrLtFtrWM9rtslcHb-nfCoERmNae79rN9Ds7TMvJNqp3Ic9t3E7HJFE5V8H_B4xEX3QvTDARcrRmybVeKU8tHWnypP-EpNEWHu6XKu3vJxn7D1E"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-[800px] mx-auto pt-8 md:pt-28 px-margin-mobile md:px-0">
+<!-- Header & Action -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+<div>
+<h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface mb-2">Perfis Editoriais</h1>
+<p class="font-body-md text-body-md text-secondary">Biblioteca de vozes e diretrizes de estilo para humanização de textos.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-surface-tint transition-colors duration-200 shadow-sm shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                Criar Novo Perfil
+            </button>
+</div>
+<!-- Filters / Quick Stats -->
+<div class="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+<div class="glass-card rounded-full px-4 py-1.5 flex items-center gap-2 shrink-0 border-primary bg-primary/5 cursor-pointer">
+<span class="font-label-md text-label-md text-primary">Todos os Perfis (12)</span>
+</div>
+<div class="glass-card rounded-full px-4 py-1.5 flex items-center gap-2 shrink-0 cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-md text-label-md text-secondary">Jornalístico (4)</span>
+</div>
+<div class="glass-card rounded-full px-4 py-1.5 flex items-center gap-2 shrink-0 cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-md text-label-md text-secondary">Corporativo (5)</span>
+</div>
+<div class="glass-card rounded-full px-4 py-1.5 flex items-center gap-2 shrink-0 cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-md text-label-md text-secondary">Criativo (3)</span>
+</div>
+</div>
+<!-- Profiles Grid -->
+<div class="flex flex-col gap-6">
+<!-- Card 1: Executivo Tech -->
+<article class="glass-card rounded-xl overflow-hidden flex flex-col group">
+<!-- Card Header (Always visible) -->
+<div class="p-6 cursor-pointer flex justify-between items-start" onclick="toggleCard(this)">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Executivo Tech</h2>
+<span class="bg-surface-container text-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-full border border-secondary/10">Ativo</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4 max-w-[600px]">Voz autoritária porém acessível, focada em inovação e resultados. Ideal para artigos de opinião e comunicados B2B no setor de tecnologia.</p>
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary mb-1 uppercase tracking-wider">Humor</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span> Otimista Pragmático</span>
+</div>
+<div class="w-px bg-secondary/10"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary mb-1 uppercase tracking-wider">Firmeza</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary-fixed-dim"></span> Alta (Direto ao ponto)</span>
+</div>
+</div>
+</div>
+<button class="text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low toggle-icon">
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+<!-- Expandable Form Area -->
+<div class="expandable-content">
+<div class="expandable-inner bg-surface-container-lowest/50 border-t border-secondary/10">
+<form class="p-6 grid gap-8">
+<!-- Section: Identidade -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">face</span>
+                                    Identidade da Voz
+                                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-secondary">Público-Alvo Principal</label>
+<input class="editorial-input rounded-lg font-body-sm text-body-sm text-on-surface w-full" type="text" value="C-Level, Diretores de TI, Investidores"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-secondary">Arquétipo</label>
+<select class="editorial-input rounded-lg font-body-sm text-body-sm text-on-surface w-full bg-transparent appearance-none">
+<option>O Sábio / O Criador</option>
+<option>O Herói</option>
+<option>O Explorador</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section: Direção Editorial -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">menu_book</span>
+                                    Direção Editorial
+                                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Sempre Usar (Do's)
+                                        </label>
+<textarea class="editorial-input rounded-lg font-body-sm text-body-sm text-on-surface w-full h-24 resize-none">Analogias com engenharia de software; frases curtas e de impacto no início dos parágrafos; foco no "porquê" antes do "como".</textarea>
+<p class="font-body-sm text-body-sm text-secondary" style="font-size: 12px;">Padrões linguísticos recomendados.</p>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-error flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 16px;">cancel</span> Evitar (Don'ts)
+                                        </label>
+<textarea class="editorial-input rounded-lg font-body-sm text-body-sm text-on-surface w-full h-24 resize-none">Jargões vazios ("sinergia", "pensar fora da caixa"); tom passivo-agressivo; descrições excessivamente técnicas sem contexto de negócio.</textarea>
+<p class="font-body-sm text-body-sm text-secondary" style="font-size: 12px;">Expressões e tons proibidos.</p>
+</div>
+</div>
+</section>
+<!-- Section: Calibragem -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">tune</span>
+                                    Calibragem Fina
+                                </h3>
+<div class="flex flex-col gap-6 bg-surface-container/30 p-4 rounded-lg border border-secondary/10">
+<div class="flex items-center gap-4">
+<span class="font-label-sm text-label-sm text-secondary w-20 text-right">Formal</span>
+<input class="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="1" type="range" value="70"/>
+<span class="font-label-sm text-label-sm text-secondary w-20">Casual</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-sm text-label-sm text-secondary w-20 text-right">Objetivo</span>
+<input class="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="1" type="range" value="85"/>
+<span class="font-label-sm text-label-sm text-secondary w-20">Descritivo</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-sm text-label-sm text-secondary w-20 text-right">Humilde</span>
+<input class="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="1" type="range" value="40"/>
+<span class="font-label-sm text-label-sm text-secondary w-20">Confiante</span>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<div class="flex justify-end gap-3 pt-4 border-t border-secondary/10">
+<button class="font-label-md text-label-md text-secondary px-4 py-2 hover:text-on-surface transition-colors" type="button">Descartar Alterações</button>
+<button class="bg-surface-container-high text-on-surface font-label-md text-label-md px-6 py-2 rounded-lg border border-secondary/20 hover:bg-surface-variant transition-colors" type="button">Salvar Perfil</button>
+</div>
+</form>
+</div>
+</div>
+</article>
+<!-- Card 2: Crônica Urbana (Collapsed) -->
+<article class="glass-card rounded-xl overflow-hidden flex flex-col group">
+<div class="p-6 cursor-pointer flex justify-between items-start" onclick="toggleCard(this)">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Crônica Urbana</h2>
+<span class="bg-surface-container text-secondary font-label-sm text-label-sm px-2 py-0.5 rounded-full border border-secondary/10">Rascunho</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4 max-w-[600px]">Estilo literário focado no cotidiano, observacional e empático. Usa linguagem figurada leve e estrutura narrativa solta.</p>
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary mb-1 uppercase tracking-wider">Humor</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary-fixed"></span> Melancólico / Poético</span>
+</div>
+<div class="w-px bg-secondary/10"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary mb-1 uppercase tracking-wider">Firmeza</span>
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> Baixa (Reflexivo)</span>
+</div>
+</div>
+</div>
+<button class="text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low toggle-icon">
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+<div class="expandable-content">
+<div class="expandable-inner bg-surface-container-lowest/50 border-t border-secondary/10">
+<div class="p-6 text-center text-secondary font-body-sm text-body-sm italic">
+                            [Formulário de edição omitido para brevidade na visualização, expande igual ao superior]
+                        </div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-white/95 dark:bg-surface-container-highest/95 backdrop-blur-md border-t border-secondary/10 rounded-t-xl shadow-sm">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low rounded-lg p-2 transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-label-sm text-label-sm">Hoje</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low rounded-lg p-2 transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">view_list</span>
+<span class="font-label-sm text-label-sm">Fila</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-fixed/30 rounded-full px-4 py-1 scale-95 transition-transform duration-150 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+<span class="font-label-sm text-label-sm">Perfis</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low rounded-lg p-2 transition-colors w-16" href="#">
+<span class="material-symbols-outlined mb-1">add_circle</span>
+<span class="font-label-sm text-label-sm">Novo</span>
+</a>
+</nav>
+<script>
+        function toggleCard(headerElement) {
+            const card = headerElement.closest('.glass-card');
+            const content = card.querySelector('.expandable-content');
+            const icon = card.querySelector('.toggle-icon span');
+            
+            // Close others (optional accordion behavior)
+            // document.querySelectorAll('.expandable-content.expanded').forEach(el => {
+            //     if(el !== content) {
+            //         el.classList.remove('expanded');
+            //         el.closest('.glass-card').querySelector('.toggle-icon span').textContent = 'expand_more';
+            //         el.closest('.glass-card').classList.remove('ring-1', 'ring-primary/30');
+            //     }
+            // });
+
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                icon.textContent = 'expand_more';
+                card.classList.remove('ring-1', 'ring-primary/30', 'bg-white/95');
+                card.classList.add('bg-white/85');
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = 'expand_less';
+                card.classList.add('ring-1', 'ring-primary/30', 'bg-white/95');
+                card.classList.remove('bg-white/85');
+            }
+        }
+        
+        // Open the first card by default for demonstration
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstCardHeader = document.querySelector('.glass-card:first-child .p-6');
+            if(firstCardHeader) toggleCard(firstCardHeader);
+        });
+    </script>
+</body></html>

@@ -1,17 +1,16 @@
 sequenceDiagram
   actor U as Usuario
   participant L as /login
-  participant A as requestMagicLinkAction
-  participant OTP as Supabase OTP
-  participant CB as /auth/callback
+  participant A as signInWithPasswordAction
+  participant AUTH as Supabase Auth
   participant P as proxy.ts
   participant ACC as getAppAccess
 
   U->>L: abrir tela de login
-  L->>A: requestMagicLinkAction()
-  A->>OTP: solicitar magic link
-  OTP-->>CB: callback com code
-  CB->>P: exchangeCodeForSession() + updateSession()
+  L->>A: signInWithPasswordAction(email, senha)
+  A->>AUTH: signInWithPassword()
+  AUTH-->>A: sessao criada
+  A-->>P: redirect(/)
   P->>ACC: getAppAccess()
 
   alt configuracao ausente
@@ -20,10 +19,6 @@ sequenceDiagram
     alt nao autenticado
       ACC-->>P: Login required
     else autenticado
-      alt email != owner
-        ACC-->>P: Forbidden
-      else email = owner
-        ACC-->>P: Ready
-      end
+      ACC-->>P: Ready
     end
   end

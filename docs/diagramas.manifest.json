@@ -108,7 +108,6 @@
           "proxy.ts",
           "app/layout.tsx",
           "app/globals.css",
-          "app/auth/callback/route.ts",
           "lib/env.ts"
         ]
       }

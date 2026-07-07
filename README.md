@@ -20,7 +20,7 @@ O MVP nao publica em redes sociais. Ele organiza a producao, gera sugestoes, gua
 
 ## Fluxo principal
 
-1. Entrar com login unico via magic link.
+1. Entrar com email e senha.
 2. Cadastrar um ou mais perfis comportamentais.
 3. Criar um texto-base e escolher o canal.
 4. Ajustar tom, tamanho, CTA, formalidade e demais controles.
@@ -64,7 +64,6 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-APP_OWNER_EMAIL=
 OPENAI_API_KEY=
 ```
 

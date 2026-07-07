@@ -9,20 +9,34 @@ import {
   updateTextDraftAction,
   updateTextStatusAction,
 } from "@/app/actions";
-import { CHANNEL_PRESETS } from "@/lib/channel-presets";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { GlossaryStrip } from "@/components/glossary-strip";
 import { SetupCallout } from "@/components/setup-callout";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
-import { demoTextDetail, demoProfiles } from "@/lib/demo-data";
+import { CHANNEL_PRESETS } from "@/lib/channel-presets";
 import { getAppAccess } from "@/lib/app-context";
 import { getTextDetail, listProfiles } from "@/lib/data";
+import { demoProfiles, demoTextDetail } from "@/lib/demo-data";
+import { HUMANIZER_MODE_LABELS, HUMANIZER_PRESET_LABELS } from "@/lib/humanizer-protocol";
+import { getChannelLabel, getGlossaryItems, getStatusMeta } from "@/lib/ui";
+import { HUMANIZER_OPERATION_MODES, HUMANIZER_VOICE_PRESETS, TEXT_STATUSES } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+
+type TextDetailSearchParams = {
+  tab?: string;
+};
+
+function buildTabHref(textId: string, tab: string) {
+  return `/texts/${textId}?tab=${tab}`;
+}
 
 export default async function TextDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<TextDetailSearchParams>;
 }) {
   const { id } = await params;
   const access = await getAppAccess();
@@ -39,11 +53,21 @@ export default async function TextDetailPage({
     notFound();
   }
 
+  const paramsData = await searchParams;
   const currentOutput = text.current_version?.output_payload_json;
   const hasOutput = Boolean(currentOutput);
-  const nextStep = hasOutput
-    ? "Revise o texto final, registre o ajuste manual se necessario e avance o status quando a peca estiver pronta."
-    : "Confirme a base do job e gere a primeira sugestao para abrir o ciclo de revisao.";
+  const statusMeta = getStatusMeta(text.status);
+  const activeTab = (() => {
+    if (paramsData.tab === "base") return "base";
+    if (paramsData.tab === "publicacao") return "publicacao";
+    if (paramsData.tab === "historico") return "historico";
+    if (paramsData.tab === "texto-final") return "texto-final";
+    return hasOutput ? "texto-final" : "base";
+  })();
+  const patternBadges =
+    currentOutput?.padroes_detectados?.length
+      ? currentOutput.padroes_detectados
+      : currentOutput?.diagnostico?.map((item) => item.sinal) ?? [];
   const latestVersion = text.versions[0];
   const relatedOutputs = text.related_outputs;
   const existingChannelKeys = new Set(relatedOutputs.map((output) => output.channel_key));
@@ -55,173 +79,109 @@ export default async function TextDetailPage({
     <DashboardShell email={access.mode === "ready" ? access.user.email : undefined}>
       <div className="space-y-6">
         {isDemo ? <SetupCallout title="Workspace em modo demonstracao" /> : null}
-        <section className="panel rounded-[32px] p-6">
+
+        <section className="surface-card rounded-[32px] p-6 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
-              <Link href="/texts" className="text-sm font-semibold text-[var(--ink-soft)]">
-                Voltar para textos
+              <Link href="/texts" className="text-sm font-medium text-[var(--accent)]">
+                Voltar para a fila
               </Link>
-              <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                Workspace do texto
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold text-[var(--ink)] text-balance">
-                {text.title}
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)] text-pretty">
-                Perfil {text.profile?.nome ?? "-"} / Canal {text.channel_key} / Atualizado em{" "}
-                {formatDate(text.updated_at)}
-              </p>
-            </div>
-            <StatusBadge status={text.status} />
-          </div>
-          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div className="rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-                Proximo passo
-              </p>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{nextStep}</p>
-            </div>
-            <div className="rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-                Outputs desta fonte
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {relatedOutputs.map((output) => {
-                  const isCurrent = output.id === text.id;
-
-                  return (
-                    <Link
-                      key={output.id}
-                      href={`/texts/${output.id}`}
-                      className={
-                        isCurrent
-                          ? "button-ink"
-                          : "button-secondary"
-                      }
-                    >
-                      {CHANNEL_PRESETS.find((preset) => preset.key === output.channel_key)?.label ??
-                        output.channel_key}
-                    </Link>
-                  );
-                })}
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <span className="rounded-full bg-[var(--surface-soft)] px-3 py-1 text-sm font-medium text-[var(--ink-soft)]">
+                  {getChannelLabel(text.channel_key)}
+                </span>
+                <StatusBadge status={text.status} />
               </div>
-              <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
-                Cada canal vira um texto proprio dentro da mesma fonte. Voce pode abrir outros
-                formatos ou criar novos sem perder o contexto original.
+              <h1 className="mt-4 text-3xl font-semibold text-[var(--ink)] text-balance sm:text-4xl">
+                {text.title}
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)] text-pretty">
+                Perfil {text.profile?.nome ?? "-"} . Atualizado em {formatDate(text.updated_at)} .
+                {hasOutput
+                  ? " O texto final ja existe e pode seguir para revisao ou publicacao."
+                  : " A base ainda precisa gerar a primeira sugestao."}
               </p>
-              {missingChannelPresets.length ? (
-                <details className="mt-4 rounded-[20px] border border-[var(--border)] bg-white/70 p-4">
-                  <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--ink)]">
-                    Adicionar novos formatos de output
-                  </summary>
-                  <form
-                    action={isDemo ? undefined : createAdditionalOutputsAction}
-                    className="mt-4 space-y-4"
-                  >
-                    <input type="hidden" name="text_id" value={text.id} />
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {missingChannelPresets.map((preset) => (
-                        <label
-                          key={preset.key}
-                          className="flex items-start gap-3 rounded-[18px] border border-[var(--border)] bg-white px-4 py-3 text-sm text-[var(--ink)]"
-                        >
-                          <input
-                            type="checkbox"
-                            name="output_channels"
-                            value={preset.key}
-                            className="mt-1"
-                          />
-                          <span>
-                            <span className="block font-semibold">{preset.label}</span>
-                            <span className="mt-1 block text-sm leading-6 text-[var(--ink-soft)]">
-                              {preset.descricao}
-                            </span>
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    <SubmitButton
-                      label="Criar novos outputs"
-                      pendingLabel="Criando outputs..."
-                    />
-                  </form>
-                </details>
-              ) : null}
             </div>
+
+            <div className="flex flex-wrap gap-3">
+              {activeTab === "base" ? (
+                <form action={isDemo ? undefined : generateTextAction}>
+                  <input type="hidden" name="text_id" value={text.id} />
+                  <input type="hidden" name="notes" value="Geracao direta pelo workspace." />
+                  <SubmitButton
+                    label={hasOutput ? "Gerar nova sugestao" : "Gerar sugestao"}
+                    pendingLabel="Gerando..."
+                  />
+                </form>
+              ) : (
+                <Link href={buildTabHref(text.id, "base")} className="button-primary">
+                  Abrir base
+                </Link>
+              )}
+              <form action={isDemo ? undefined : duplicateTextAction}>
+                <input type="hidden" name="text_id" value={text.id} />
+                <SubmitButton
+                  label="Duplicar texto"
+                  pendingLabel="Duplicando..."
+                  className="button-secondary"
+                />
+              </form>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-[28px] border border-[rgba(176,71,52,0.16)] bg-[linear-gradient(135deg,rgba(255,247,244,0.95),rgba(255,255,255,0.92))] p-5">
+            <p className="text-sm font-semibold text-[var(--accent)]">Proximo passo</p>
+            <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">{statusMeta.actionLabel}</h2>
+            <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+              {hasOutput
+                ? statusMeta.helper
+                : "Revise a base, confirme o perfil e gere a primeira sugestao para abrir a etapa de revisao."}
+            </p>
           </div>
         </section>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <section className="min-w-0 space-y-6">
-            {hasOutput ? (
-              <article className="panel min-w-0 rounded-[32px] p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                  Revisao final
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                  Edite a versao que vai para publicacao
-                </h3>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-                  Esta e a area principal da tela. Se o texto estiver quase pronto, ajuste aqui e
-                  salve uma nova versao manual.
-                </p>
-                <form action={isDemo ? undefined : saveManualVersionAction} className="mt-5">
-                  <input type="hidden" name="text_id" value={text.id} />
-                  <div>
-                    <label className="field-label">Texto final editado</label>
-                    <textarea
-                      name="texto_final"
-                      defaultValue={currentOutput?.texto_final ?? ""}
-                      className="field min-h-72"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="field-label">Notas desta versao</label>
-                    <input
-                      name="notes"
-                      className="field"
-                      placeholder="O que mudou nesta versao?"
-                    />
-                  </div>
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <SubmitButton
-                      label="Salvar versao manual"
-                      pendingLabel="Salvando..."
-                    />
-                  </div>
-                </form>
-              </article>
-            ) : null}
+        <section className="surface-card rounded-[32px] px-6 py-4 sm:px-8">
+          <div className="flex flex-wrap gap-6 border-b border-[var(--border)]">
+            {[
+              ["base", "Base"],
+              ["texto-final", "Texto final"],
+              ["publicacao", "Publicacao"],
+              ["historico", "Historico"],
+            ].map(([tab, label]) => {
+              const active = activeTab === tab;
 
-            <details open={!hasOutput} className="panel min-w-0 rounded-[32px] p-6">
-              <summary className="cursor-pointer list-none">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                  Base do job
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                  {hasOutput ? "Reabrir contexto e gerar nova sugestao" : "Ajuste o essencial antes de gerar"}
-                </h3>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-                  {hasOutput
-                    ? "Use esta secao apenas quando a base mudou, o canal mudou ou voce precisa reprocessar o texto."
-                    : "Deixe visivel apenas o que decide o primeiro rascunho: titulo, perfil, canal e texto original."}
-                </p>
-              </summary>
-              <form action={isDemo ? undefined : updateTextDraftAction} className="mt-5">
+              return (
+                <Link
+                  key={tab}
+                  href={buildTabHref(text.id, tab)}
+                  className={active ? "workspace-tab workspace-tab-active" : "workspace-tab"}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        <GlossaryStrip items={getGlossaryItems(["formato", "status", "estilo-de-voz"])} />
+
+        {activeTab === "base" ? (
+          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+            <article className="surface-card rounded-[32px] p-6 sm:p-8">
+              <p className="text-sm font-semibold text-[var(--accent)]">Base do texto</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                Ajuste apenas o que muda a proxima geracao
+              </h2>
+              <form action={isDemo ? undefined : updateTextDraftAction} className="mt-6">
                 <input type="hidden" name="text_id" value={text.id} />
                 <div className="grid gap-4 md:grid-cols-3">
                   <div>
-                    <label className="field-label">Titulo</label>
+                    <label className="field-label">Nome interno</label>
                     <input name="title" defaultValue={text.title} required className="field" />
                   </div>
                   <div>
                     <label className="field-label">Perfil</label>
-                    <select
-                      name="profile_id"
-                      defaultValue={text.profile_id}
-                      required
-                      className="field"
-                    >
+                    <select name="profile_id" defaultValue={text.profile_id} required className="field">
                       {profiles.map((profile) => (
                         <option key={profile.id} value={profile.id}>
                           {profile.nome}
@@ -230,26 +190,25 @@ export default async function TextDetailPage({
                     </select>
                   </div>
                   <div>
-                    <label className="field-label">Output deste texto</label>
-                    <div className="field flex items-center">
-                      {CHANNEL_PRESETS.find((preset) => preset.key === text.channel_key)?.label ??
-                        text.channel_key}
-                    </div>
+                    <label className="field-label">Formato deste texto</label>
+                    <div className="field flex items-center">{getChannelLabel(text.channel_key)}</div>
                     <input type="hidden" name="channel_key" value={text.channel_key} />
                   </div>
                 </div>
+
                 <div className="mt-4">
-                  <label className="field-label">Texto original</label>
+                  <label className="field-label">Texto base</label>
                   <textarea
                     name="original_text"
                     defaultValue={text.original_text}
                     required
-                    className="field min-h-44"
+                    className="field min-h-72"
                   />
                 </div>
-                <details className="mt-4 rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
+
+                <details className="mt-4 rounded-[28px] border border-[var(--border)] bg-white/78 p-5 sm:p-6">
                   <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--ink)]">
-                    Abrir ajustes avancados de canal, tom e instrucoes
+                    Abrir ajustes avancados
                   </summary>
                   <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
@@ -283,14 +242,11 @@ export default async function TextDetailPage({
                       </select>
                     </div>
                   </div>
+
                   <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
                       <label className="field-label">Formalidade</label>
-                      <select
-                        name="formalidade"
-                        defaultValue={text.formalidade}
-                        className="field"
-                      >
+                      <select name="formalidade" defaultValue={text.formalidade} className="field">
                         {["baixa", "media", "alta"].map((option) => (
                           <option key={option} value={option}>
                             {option}
@@ -309,12 +265,39 @@ export default async function TextDetailPage({
                         className="field"
                       />
                     </div>
+                    <div>
+                      <label className="field-label">Modo de humanizacao</label>
+                      <select
+                        name="modo_operacao"
+                        defaultValue={text.modo_operacao}
+                        className="field"
+                      >
+                        {HUMANIZER_OPERATION_MODES.map((mode) => (
+                          <option key={mode} value={mode}>
+                            {HUMANIZER_MODE_LABELS[mode]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="field-label">Estilo de voz</label>
+                      <select
+                        name="preset_de_voz"
+                        defaultValue={text.preset_de_voz}
+                        className="field"
+                      >
+                        {HUMANIZER_VOICE_PRESETS.map((voicePreset) => (
+                          <option key={voicePreset} value={voicePreset}>
+                            {HUMANIZER_PRESET_LABELS[voicePreset]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <label className="flex items-center gap-3 rounded-[20px] border border-[var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-[var(--ink)]">
-                      <input
-                        type="checkbox"
-                        name="usar_emojis"
-                        defaultChecked={text.usar_emojis}
-                      />
+                      <input type="checkbox" name="usar_emojis" defaultChecked={text.usar_emojis} />
                       Usar emojis
                     </label>
                     <label className="flex items-center gap-3 rounded-[20px] border border-[var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-[var(--ink)]">
@@ -325,17 +308,7 @@ export default async function TextDetailPage({
                       />
                       Usar hashtags
                     </label>
-                  </div>
-                  <div className="mt-4 grid gap-4 md:grid-cols-[1fr_0.7fr]">
-                    <div>
-                      <label className="field-label">Instrucoes extras</label>
-                      <textarea
-                        name="instrucoes_extras"
-                        defaultValue={text.instrucoes_extras}
-                        className="field min-h-24"
-                      />
-                    </div>
-                    <label className="flex items-center gap-3 rounded-[20px] border border-[var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-[var(--ink)]">
+                    <label className="flex items-center gap-3 rounded-[20px] border border-[var(--border)] bg-white/70 px-4 py-3 text-sm font-medium text-[var(--ink)] md:col-span-2">
                       <input
                         type="checkbox"
                         name="primeira_pessoa"
@@ -344,7 +317,17 @@ export default async function TextDetailPage({
                       Preferir primeira pessoa
                     </label>
                   </div>
+
+                  <div className="mt-4">
+                    <label className="field-label">Instrucoes extras</label>
+                    <textarea
+                      name="instrucoes_extras"
+                      defaultValue={text.instrucoes_extras}
+                      className="field min-h-24"
+                    />
+                  </div>
                 </details>
+
                 <div className="mt-6 flex flex-wrap gap-3">
                   <SubmitButton
                     label="Salvar base"
@@ -353,64 +336,173 @@ export default async function TextDetailPage({
                   />
                 </div>
               </form>
-              <div className="mt-6 border-t border-[var(--border)] pt-6">
-                <p className="text-sm font-semibold text-[var(--ink)]">Acoes desta base</p>
-                <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-                  {hasOutput
-                    ? "Se o contexto mudou o suficiente para invalidar a versao atual, gere uma nova sugestao."
-                    : "Quando a base estiver coerente, gere a primeira sugestao para abrir a revisao."}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <form action={isDemo ? undefined : generateTextAction}>
-                  <input type="hidden" name="text_id" value={text.id} />
-                  <input type="hidden" name="notes" value="Geracao direta pelo workspace." />
-                  <SubmitButton
-                    label={hasOutput ? "Gerar nova sugestao" : "Gerar sugestao"}
-                    pendingLabel="Gerando..."
-                  />
-                </form>
-                <form action={isDemo ? undefined : duplicateTextAction}>
-                  <input type="hidden" name="text_id" value={text.id} />
-                  <SubmitButton
-                    label="Duplicar texto"
-                    pendingLabel="Duplicando..."
-                    className="button-secondary"
-                  />
-                </form>
-              </div>
-            </details>
-          </section>
+            </article>
 
-          <section className="min-w-0 space-y-6">
-            <article id="workflow" className="panel min-w-0 rounded-[32px] p-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                Workflow
+            <div className="space-y-6">
+              <article className="surface-card rounded-[32px] p-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">Guia rapido</p>
+                <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                  O que precisa estar certo aqui
+                </h2>
+                <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  <li>Titulo interno claro para localizar o texto depois.</li>
+                  <li>Perfil alinhado com a voz que voce quer reproduzir.</li>
+                  <li>Texto base com contexto suficiente para a proxima geracao.</li>
+                </ul>
+              </article>
+
+              <article className="surface-card rounded-[32px] p-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">Formatos relacionados</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {relatedOutputs.map((output) => {
+                    const isCurrent = output.id === text.id;
+
+                    return (
+                      <Link
+                        key={output.id}
+                        href={`/texts/${output.id}`}
+                        className={isCurrent ? "button-ink" : "button-secondary"}
+                      >
+                        {getChannelLabel(output.channel_key)}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </article>
+            </div>
+          </section>
+        ) : null}
+
+        {activeTab === "texto-final" ? (
+          hasOutput ? (
+            <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)_320px]">
+              <article className="surface-card rounded-[32px] p-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">Base</p>
+                <h2 className="mt-2 text-xl font-semibold text-[var(--ink)]">
+                  Texto original de referencia
+                </h2>
+                <div className="text-scroll-area text-scroll-area-compact mt-4">
+                  <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
+                    {text.original_text}
+                  </p>
+                </div>
+              </article>
+
+              <article className="surface-card rounded-[32px] p-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">Texto final</p>
+                <h2 className="mt-2 text-xl font-semibold text-[var(--ink)]">
+                  Edite a versao que segue para aprovacao
+                </h2>
+                <form action={isDemo ? undefined : saveManualVersionAction} className="mt-6">
+                  <input type="hidden" name="text_id" value={text.id} />
+                  <div>
+                    <label className="field-label">Texto final</label>
+                    <textarea
+                      name="texto_final"
+                      defaultValue={currentOutput?.texto_final ?? ""}
+                      className="field min-h-[28rem]"
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <label className="field-label">Notas desta versao</label>
+                    <input
+                      name="notes"
+                      className="field"
+                      placeholder="O que mudou nesta versao?"
+                    />
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <SubmitButton
+                      label="Salvar versao manual"
+                      pendingLabel="Salvando..."
+                    />
+                  </div>
+                </form>
+              </article>
+
+              <div className="space-y-6">
+                <article className="surface-card rounded-[32px] p-6">
+                  <p className="text-sm font-semibold text-[var(--accent)]">Resumo</p>
+                  <h2 className="mt-2 text-xl font-semibold text-[var(--ink)]">
+                    O que o motor mudou
+                  </h2>
+                  <div className="text-scroll-area mt-3">
+                    <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
+                      {currentOutput?.resumo_das_alteracoes ?? "Sem resumo registrado."}
+                    </p>
+                  </div>
+                </article>
+
+                <article className="surface-card rounded-[32px] p-6">
+                  <p className="text-sm font-semibold text-[var(--accent)]">Pistas de revisao</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {patternBadges.length ? (
+                      patternBadges.map((pattern) => (
+                        <span
+                          key={pattern}
+                          className="rounded-[var(--radius-pill)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--ink)]"
+                        >
+                          {pattern}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="rounded-[var(--radius-pill)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--ink)]">
+                        Nenhum destaque
+                      </span>
+                    )}
+                  </div>
+                  {currentOutput?.alertas?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {currentOutput.alertas.map((alerta) => (
+                        <span
+                          key={alerta}
+                          className="rounded-[var(--radius-pill)] border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800"
+                        >
+                          {alerta}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              </div>
+            </section>
+          ) : (
+            <section className="surface-card rounded-[32px] p-6 sm:p-8">
+              <h2 className="text-2xl font-semibold text-[var(--ink)]">
+                Ainda nao existe texto final para revisar.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                O caminho natural e abrir a aba Base, revisar o contexto e usar a acao Gerar
+                sugestao.
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                Controle editorial e publicacao
-              </h3>
-              <form action={isDemo ? undefined : updateTextStatusAction} className="mt-5 space-y-4">
+              <Link href={buildTabHref(text.id, "base")} className="button-primary mt-5">
+                Ir para a base
+              </Link>
+            </section>
+          )
+        ) : null}
+
+        {activeTab === "publicacao" ? (
+          <section className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
+            <article className="surface-card rounded-[32px] p-6">
+              <p className="text-sm font-semibold text-[var(--accent)]">Publicacao</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                Atualize o status e registre o link final
+              </h2>
+              <form action={isDemo ? undefined : updateTextStatusAction} className="mt-6 space-y-4">
                 <input type="hidden" name="text_id" value={text.id} />
                 <div>
                   <label className="field-label">Status</label>
                   <select name="status" defaultValue={text.status} className="field">
-                    {[
-                      "rascunho",
-                      "gerado",
-                      "em_revisao",
-                      "aprovado",
-                      "publicado",
-                      "arquivado",
-                    ].map((status) => (
+                    {TEXT_STATUSES.map((status) => (
                       <option key={status} value={status}>
-                        {status}
+                        {getStatusMeta(status).label}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="field-label">URL publicada (opcional)</label>
+                  <label className="field-label">URL publicada</label>
                   <input
                     name="published_url"
                     defaultValue={text.published_url ?? ""}
@@ -422,56 +514,184 @@ export default async function TextDetailPage({
               </form>
             </article>
 
-            <article id="saida-atual" className="panel min-w-0 rounded-[32px] p-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                Saida atual
-              </p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                Leitura de apoio do motor
-              </h3>
-              {currentOutput ? (
-                <div className="mt-5 space-y-5">
-                  <div className="rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-                      Padroes detectados
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {currentOutput.padroes_detectados.map((pattern) => (
-                        <span
-                          key={pattern}
-                          className="rounded-[var(--radius-pill)] bg-[var(--surface-strong)] px-3 py-1 text-xs font-semibold text-[var(--ink)]"
+            <div className="space-y-6">
+              <article className="surface-card rounded-[32px] p-6">
+                <p className="text-sm font-semibold text-[var(--accent)]">Formatos desta fonte</p>
+                <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                  Abra outro formato sem perder a base original
+                </h2>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {relatedOutputs.map((output) => {
+                    const isCurrent = output.id === text.id;
+
+                    return (
+                      <Link
+                        key={output.id}
+                        href={`/texts/${output.id}`}
+                        className={isCurrent ? "button-ink" : "button-secondary"}
+                      >
+                        {getChannelLabel(output.channel_key)}
+                      </Link>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  Cada formato tem historico e status proprios, mas todos continuam ligados a esta
+                  mesma fonte.
+                </p>
+              </article>
+
+              {missingChannelPresets.length ? (
+                <article className="surface-card rounded-[32px] p-6">
+                  <p className="text-sm font-semibold text-[var(--accent)]">Adicionar formatos</p>
+                  <form
+                    action={isDemo ? undefined : createAdditionalOutputsAction}
+                    className="mt-5 space-y-4"
+                  >
+                    <input type="hidden" name="text_id" value={text.id} />
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {missingChannelPresets.map((preset) => (
+                        <label
+                          key={preset.key}
+                          className="flex items-start gap-3 rounded-[18px] border border-[var(--border)] bg-white px-4 py-3 text-sm text-[var(--ink)]"
                         >
-                          {pattern}
-                        </span>
+                          <input
+                            type="checkbox"
+                            name="output_channels"
+                            value={preset.key}
+                            className="mt-1"
+                          />
+                          <span>
+                            <span className="block font-semibold">{preset.label}</span>
+                            <span className="mt-1 block text-sm leading-6 text-[var(--ink-soft)]">
+                              {preset.descricao}
+                            </span>
+                          </span>
+                        </label>
                       ))}
                     </div>
-                  </div>
-                  <div className="rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-                      Resumo das alteracoes
+                    <SubmitButton
+                      label="Criar novos formatos"
+                      pendingLabel="Criando formatos..."
+                    />
+                  </form>
+                </article>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
+        {activeTab === "historico" ? (
+          <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <article className="surface-card rounded-[32px] p-6">
+              <p className="text-sm font-semibold text-[var(--accent)]">Historico</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                Versoes registradas deste texto
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                Ultima versao: {latestVersion ? `v${latestVersion.version_number}` : "nenhuma"}.
+              </p>
+              <div className="mt-6 space-y-3">
+                {text.versions.map((version) => (
+                  <div
+                    key={version.id}
+                    className="rounded-[22px] border border-[var(--border)] bg-white/78 p-4"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-[var(--ink)]">
+                        Versao {version.version_number} / {version.source}
+                      </p>
+                      <p className="text-xs text-[var(--ink-muted)]">{formatDate(version.created_at)}</p>
+                    </div>
+                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+                      {version.error || version.notes || "Sem observacoes"}
                     </p>
-                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
-                      {currentOutput.resumo_das_alteracoes}
-                    </p>
+                    {version.error ? (
+                      <p className="mt-2 text-xs leading-6 text-rose-700">Erro: {version.error}</p>
+                    ) : null}
                   </div>
-                  <details className="rounded-[24px] border border-[var(--border)] bg-white/70 p-5">
+                ))}
+              </div>
+            </article>
+
+            <article className="surface-card rounded-[32px] p-6">
+              <p className="text-sm font-semibold text-[var(--accent)]">Historico tecnico</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
+                Auditoria recolhida fora da area principal
+              </h2>
+              {currentOutput ? (
+                <div className="mt-5 space-y-5">
+                  {currentOutput.relatorio_curto ? (
+                    <div className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5">
+                      <p className="text-xs font-semibold text-[var(--ink-muted)]">
+                        Relatorio curto
+                      </p>
+                      <div className="text-scroll-area mt-3">
+                        <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
+                          {currentOutput.relatorio_curto}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5">
+                    <p className="text-xs font-semibold text-[var(--ink-muted)]">
+                      Modo e estilo aplicados
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {currentOutput.modo_operacao ? (
+                        <span className="rounded-[var(--radius-pill)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--ink)]">
+                          Modo {HUMANIZER_MODE_LABELS[currentOutput.modo_operacao]}
+                        </span>
+                      ) : null}
+                      {currentOutput.preset_aplicado ? (
+                        <span className="rounded-[var(--radius-pill)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--ink)]">
+                          Estilo {HUMANIZER_PRESET_LABELS[currentOutput.preset_aplicado]}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {currentOutput.score_humanizacao ? (
+                    <div className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5">
+                      <p className="text-xs font-semibold text-[var(--ink-muted)]">
+                        Score de humanizacao
+                      </p>
+                      <pre className="mt-3 overflow-x-auto text-xs leading-6 text-[var(--ink-soft)]">
+                        {JSON.stringify(currentOutput.score_humanizacao, null, 2)}
+                      </pre>
+                    </div>
+                  ) : null}
+
+                  {currentOutput.diagnostico?.length ? (
+                    <div className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5">
+                      <p className="text-xs font-semibold text-[var(--ink-muted)]">
+                        Diagnostico estruturado
+                      </p>
+                      <pre className="text-scroll-area mt-3 overflow-x-auto text-xs leading-6 text-[var(--ink-soft)]">
+                        {JSON.stringify(currentOutput.diagnostico, null, 2)}
+                      </pre>
+                    </div>
+                  ) : null}
+
+                  <details className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5">
                     <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--ink)]">
-                      Ver esboco e metadados tecnicos
+                      Ver esboco e metadados do canal
                     </summary>
                     <div className="mt-5 space-y-5">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
-                          Esboco
-                        </p>
-                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
-                          {currentOutput.esboco}
-                        </p>
+                        <p className="text-xs font-semibold text-[var(--ink-muted)]">Esboco</p>
+                        <div className="text-scroll-area mt-3">
+                          <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
+                            {currentOutput.esboco}
+                          </p>
+                        </div>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+                        <p className="text-xs font-semibold text-[var(--ink-muted)]">
                           Metadados do canal
                         </p>
-                        <pre className="mt-3 overflow-x-auto text-xs leading-6 text-[var(--ink-soft)]">
+                        <pre className="text-scroll-area mt-3 overflow-x-auto text-xs leading-6 text-[var(--ink-soft)]">
                           {JSON.stringify(currentOutput.metadados_do_canal, null, 2)}
                         </pre>
                       </div>
@@ -481,60 +701,13 @@ export default async function TextDetailPage({
               ) : (
                 <div className="mt-5 rounded-[24px] border border-dashed border-[var(--border-strong)] bg-white/70 p-5">
                   <p className="text-sm font-semibold text-[var(--ink)]">
-                    Ainda nao existe versao gerada para este texto.
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                    O caminho natural e revisar a base do job e usar a acao `Gerar sugestao`.
+                    A auditoria tecnica aparece aqui depois da primeira geracao.
                   </p>
                 </div>
               )}
             </article>
-
-            <details id="historico" className="panel min-w-0 rounded-[32px] p-6">
-              <summary className="cursor-pointer list-none">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--ink-muted)]">
-                  Historico
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                  Versoes e observacoes registradas
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                  Ultima versao: {latestVersion ? `v${latestVersion.version_number}` : "nenhuma"}.
-                </p>
-              </summary>
-              <div className="mt-5 space-y-3">
-                {text.versions.map((version) => (
-                  <div
-                    key={version.id}
-                    className="rounded-[22px] border border-[var(--border)] bg-white/70 p-4"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-[var(--ink)]">
-                        Versao {version.version_number} / {version.source}
-                      </p>
-                      <p className="text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-                        {formatDate(version.created_at)}
-                      </p>
-                    </div>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      {version.error || version.notes || "Sem observacoes"}
-                    </p>
-                    {version.error ? (
-                      <p className="mt-2 text-xs leading-6 text-rose-700">
-                        Erro: {version.error}
-                      </p>
-                    ) : null}
-                    {version.error && version.notes ? (
-                      <p className="mt-1 text-xs leading-6 text-[var(--ink-muted)]">
-                        Nota: {version.notes}
-                      </p>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            </details>
           </section>
-        </div>
+        ) : null}
       </div>
     </DashboardShell>
   );

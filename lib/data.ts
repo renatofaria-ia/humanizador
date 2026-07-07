@@ -1,4 +1,5 @@
-import "server-only";
+﻿import "server-only";
+import { randomUUID } from "node:crypto";
 
 import { getChannelPreset } from "@/lib/channel-presets";
 import { requireReadyUser } from "@/lib/app-context";
@@ -18,6 +19,20 @@ import {
 
 function normalizeChannelKeys(channelKeys: ChannelKey[]) {
   return [...new Set(channelKeys)].filter(Boolean);
+}
+
+function isActiveVersion(version: Pick<TextVersion, "deleted_at"> | null | undefined) {
+  return !version?.deleted_at;
+}
+
+function sortVersionsNewestFirst(left: TextVersion, right: TextVersion) {
+  const timeDiff = new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
+
+  if (timeDiff !== 0) {
+    return timeDiff;
+  }
+
+  return right.version_number - left.version_number;
 }
 
 async function listRelatedOutputsForSource(input: {
@@ -44,17 +59,166 @@ async function listRelatedOutputsForSource(input: {
 
 function mapControls(record: TextRecord): TextControls {
   return {
-    objetivo: record.objetivo,
-    cta: record.cta,
-    tom: record.tom,
-    tamanho: record.tamanho,
-    formalidade: record.formalidade,
-    usarEmojis: record.usar_emojis,
-    usarHashtags: record.usar_hashtags,
-    primeiraPessoa: record.primeira_pessoa,
-    nivelOusadia: record.nivel_ousadia,
-    instrucoesExtras: record.instrucoes_extras,
+    objetivo: record.objetivo ?? DEFAULT_TEXT_CONTROLS.objetivo,
+    cta: record.cta ?? DEFAULT_TEXT_CONTROLS.cta,
+    tom: record.tom ?? DEFAULT_TEXT_CONTROLS.tom,
+    tamanho: record.tamanho ?? DEFAULT_TEXT_CONTROLS.tamanho,
+    formalidade: record.formalidade ?? DEFAULT_TEXT_CONTROLS.formalidade,
+    usarEmojis: record.usar_emojis ?? DEFAULT_TEXT_CONTROLS.usarEmojis,
+    usarHashtags: record.usar_hashtags ?? DEFAULT_TEXT_CONTROLS.usarHashtags,
+    primeiraPessoa: record.primeira_pessoa ?? DEFAULT_TEXT_CONTROLS.primeiraPessoa,
+    nivelOusadia: record.nivel_ousadia ?? DEFAULT_TEXT_CONTROLS.nivelOusadia,
+    instrucoesExtras: record.instrucoes_extras ?? DEFAULT_TEXT_CONTROLS.instrucoesExtras,
+    modoOperacao: record.modo_operacao ?? DEFAULT_TEXT_CONTROLS.modoOperacao,
+    presetDeVoz: record.preset_de_voz ?? DEFAULT_TEXT_CONTROLS.presetDeVoz,
   };
+}
+
+function getSupabaseErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+
+  return String(error ?? "");
+}
+
+function getSupabaseErrorCode(error: unknown) {
+  if (typeof error === "object" && error !== null && "code" in error) {
+    const code = (error as { code?: unknown }).code;
+    if (typeof code === "string") {
+      return code;
+    }
+  }
+
+  return "";
+}
+
+function isMissingTextEditorialColumnError(error: unknown) {
+  const message = getSupabaseErrorMessage(error);
+  const code = getSupabaseErrorCode(error);
+  return (
+    code === "PGRST204" ||
+    message.includes("modo_operacao") ||
+    message.includes("preset_de_voz") ||
+    message.includes("schema cache") ||
+    message.includes("source_bundle_id")
+  );
+}
+
+function isMissingSourceBundleIdColumnError(error: unknown) {
+  const message = getSupabaseErrorMessage(error);
+  const code = getSupabaseErrorCode(error);
+  return code === "PGRST204" || message.includes("source_bundle_id");
+}
+
+function isMissingBaseActiveColumnError(error: unknown) {
+  const message = getSupabaseErrorMessage(error);
+  const code = getSupabaseErrorCode(error);
+  return code === "PGRST204" || message.includes("base_active") || message.includes("schema cache");
+}
+
+function isMissingTextVersionSoftDeleteColumnError(error: unknown) {
+  const message = getSupabaseErrorMessage(error);
+  const code = getSupabaseErrorCode(error);
+  return (
+    code === "PGRST204" ||
+    message.includes("deleted_at") ||
+    message.includes("deleted_by") ||
+    message.includes("deleted_reason") ||
+    message.includes("schema cache")
+  );
+}
+
+function mapTextRecordWithBaseActive<T extends { base_active?: boolean | null }>(record: T) {
+  return {
+    ...record,
+    base_active: record.base_active ?? true,
+  };
+}
+
+function buildMinimalTextInsertPayload(input: {
+  title: string;
+  originalText: string;
+  profileId: string;
+  channelKey: ChannelKey;
+  sourceBundleId?: string;
+}) {
+  return {
+    ...(input.sourceBundleId ? { source_bundle_id: input.sourceBundleId } : {}),
+    title: input.title,
+    original_text: input.originalText,
+    profile_id: input.profileId,
+    channel_key: input.channelKey,
+    status: "rascunho" as const,
+  };
+}
+
+function buildTextControlsPatch(input: { controls: Partial<TextControls> }) {
+  const controls = { ...DEFAULT_TEXT_CONTROLS, ...input.controls };
+
+  return {
+    objetivo: controls.objetivo,
+    cta: controls.cta,
+    tom: controls.tom,
+    tamanho: controls.tamanho,
+    formalidade: controls.formalidade,
+    usar_emojis: controls.usarEmojis,
+    usar_hashtags: controls.usarHashtags,
+    primeira_pessoa: controls.primeiraPessoa,
+    nivel_ousadia: controls.nivelOusadia,
+    instrucoes_extras: controls.instrucoesExtras,
+    modo_operacao: controls.modoOperacao,
+    preset_de_voz: controls.presetDeVoz,
+  };
+}
+
+function buildSafeTextControlsPatch(input: { controls: Partial<TextControls> }) {
+  const controls = { ...DEFAULT_TEXT_CONTROLS, ...input.controls };
+
+  return {
+    objetivo: controls.objetivo,
+    cta: controls.cta,
+    tom: controls.tom,
+    tamanho: controls.tamanho,
+    formalidade: controls.formalidade,
+    usar_emojis: controls.usarEmojis,
+    usar_hashtags: controls.usarHashtags,
+    primeira_pessoa: controls.primeiraPessoa,
+    nivel_ousadia: controls.nivelOusadia,
+    instrucoes_extras: controls.instrucoesExtras,
+  };
+}
+
+async function patchTextControls(
+  supabase: Awaited<ReturnType<typeof requireReadyUser>>["supabase"],
+  userId: string,
+  textId: string,
+  controls: Partial<TextControls>,
+) {
+  let result = await supabase
+    .from("texts")
+    .update(buildTextControlsPatch({ controls }))
+    .eq("id", textId)
+    .eq("user_id", userId);
+
+  if (result.error && isMissingTextEditorialColumnError(result.error)) {
+    result = await supabase
+      .from("texts")
+      .update(buildSafeTextControlsPatch({ controls }))
+      .eq("id", textId)
+      .eq("user_id", userId);
+  }
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
 }
 
 async function getNextVersionNumber(textId: string) {
@@ -68,6 +232,58 @@ async function getNextVersionNumber(textId: string) {
     .maybeSingle();
 
   return (data?.version_number ?? 0) + 1;
+}
+
+async function listTextVersionsByTextIds(input: { textIds: string[]; userId: string }) {
+  const { supabase } = await requireReadyUser();
+  let result = await supabase
+    .from("text_versions")
+    .select("*")
+    .in("text_id", input.textIds)
+    .eq("user_id", input.userId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+  if (result.error && isMissingTextVersionSoftDeleteColumnError(result.error)) {
+    result = await supabase
+      .from("text_versions")
+      .select("*")
+      .in("text_id", input.textIds)
+      .eq("user_id", input.userId)
+      .order("created_at", { ascending: false });
+  }
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  return (result.data ?? []) as TextVersion[];
+}
+
+async function listTextVersionsByTextId(input: { textId: string; userId: string }) {
+  const { supabase } = await requireReadyUser();
+  let result = await supabase
+    .from("text_versions")
+    .select("*")
+    .eq("text_id", input.textId)
+    .eq("user_id", input.userId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+  if (result.error && isMissingTextVersionSoftDeleteColumnError(result.error)) {
+    result = await supabase
+      .from("text_versions")
+      .select("*")
+      .eq("text_id", input.textId)
+      .eq("user_id", input.userId)
+      .order("created_at", { ascending: false });
+  }
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  return (result.data ?? []) as TextVersion[];
 }
 
 export async function listProfiles() {
@@ -105,7 +321,7 @@ export async function listTexts() {
   const { supabase, user } = await requireReadyUser();
   const { data, error } = await supabase
     .from("texts")
-    .select("*, profiles(id, nome)")
+    .select("*, profiles(id, nome), current_version:text_versions!texts_current_version_id_fkey(*)")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
@@ -113,12 +329,37 @@ export async function listTexts() {
     throw new Error(error.message);
   }
 
-  return ((data ?? []) as Array<TextSummary & { profiles?: { id: string; nome: string } }>).map(
-    (item) => ({
-      ...item,
-      profile: item.profiles,
-    }),
-  );
+  const textIds = (data ?? []).map((item) => item.id as string);
+  let versionsByTextId = new Map<string, TextVersion[]>();
+
+  if (textIds.length) {
+    const versions = await listTextVersionsByTextIds({
+      textIds,
+      userId: user.id,
+    });
+
+    versionsByTextId = versions.reduce((acc, version) => {
+      const textId = String(version.text_id);
+      const current = acc.get(textId) ?? [];
+      current.push(version);
+      acc.set(textId, current);
+      return acc;
+    }, new Map<string, TextVersion[]>());
+  }
+
+  return (
+    (data ?? []) as Array<
+      TextSummary & {
+        profiles?: { id: string; nome: string };
+        current_version?: TextVersion | null;
+      }
+    >
+  ).map((item) => ({
+    ...mapTextRecordWithBaseActive(item),
+    profile: item.profiles,
+    current_version: isActiveVersion(item.current_version) ? item.current_version ?? null : null,
+    versions: (versionsByTextId.get(String(item.id)) ?? []).sort(sortVersionsNewestFirst),
+  }));
 }
 
 export async function getTextDetail(textId: string) {
@@ -138,16 +379,10 @@ export async function getTextDetail(textId: string) {
     return null;
   }
 
-  const { data: versions, error: versionError } = await supabase
-    .from("text_versions")
-    .select("*")
-    .eq("text_id", textId)
-    .eq("user_id", user.id)
-    .order("version_number", { ascending: false });
-
-  if (versionError) {
-    throw new Error(versionError.message);
-  }
+  const versions = await listTextVersionsByTextId({
+    textId,
+    userId: user.id,
+  });
 
   const relatedOutputs = await listRelatedOutputsForSource({
     title: text.title,
@@ -155,16 +390,17 @@ export async function getTextDetail(textId: string) {
     profileId: text.profile_id,
   });
 
+  const activeVersions = versions.sort(sortVersionsNewestFirst);
   const currentVersion =
-    (versions ?? []).find((version) => version.id === text.current_version_id) ??
-    (versions ?? [])[0] ??
+    activeVersions.find((version) => version.id === text.current_version_id) ??
+    activeVersions[0] ??
     null;
 
   return {
-    ...(text as TextRecord),
+    ...mapTextRecordWithBaseActive(text as TextRecord),
     profile: (text as { profiles?: Profile }).profiles ?? null,
     current_version: currentVersion as TextVersion | null,
-    versions: (versions ?? []) as TextVersion[],
+    versions: activeVersions,
     related_outputs: (relatedOutputs ?? []) as TextOutputVariant[],
   } as TextDetail;
 }
@@ -205,36 +441,22 @@ export async function createText(input: {
   controls?: Partial<TextControls>;
 }) {
   const { supabase, user } = await requireReadyUser();
-  const controls = { ...DEFAULT_TEXT_CONTROLS, ...(input.controls ?? {}) };
-
-  const { data, error } = await supabase
+  const result = await supabase
     .from("texts")
     .insert({
       user_id: user.id,
-      title: input.title,
-      original_text: input.originalText,
-      profile_id: input.profileId,
-      channel_key: input.channelKey,
-      status: "rascunho",
-      objetivo: controls.objetivo,
-      cta: controls.cta,
-      tom: controls.tom,
-      tamanho: controls.tamanho,
-      formalidade: controls.formalidade,
-      usar_emojis: controls.usarEmojis,
-      usar_hashtags: controls.usarHashtags,
-      primeira_pessoa: controls.primeiraPessoa,
-      nivel_ousadia: controls.nivelOusadia,
-      instrucoes_extras: controls.instrucoesExtras,
+      ...buildMinimalTextInsertPayload(input),
     })
     .select("id")
     .single();
 
-  if (error) {
-    throw new Error(error.message);
+  if (result.error) {
+    throw new Error(result.error.message);
   }
 
-  return data.id as string;
+  await patchTextControls(supabase, user.id, result.data.id as string, input.controls ?? {});
+
+  return result.data.id as string;
 }
 
 export async function createTextBundle(input: {
@@ -243,44 +465,52 @@ export async function createTextBundle(input: {
   profileId: string;
   channelKeys: ChannelKey[];
   controls?: Partial<TextControls>;
+  sourceBundleId?: string;
 }) {
   const { supabase, user } = await requireReadyUser();
-  const controls = { ...DEFAULT_TEXT_CONTROLS, ...(input.controls ?? {}) };
   const channelKeys = normalizeChannelKeys(input.channelKeys);
+  const sourceBundleId = input.sourceBundleId ?? randomUUID();
 
   if (!channelKeys.length) {
     throw new Error("Selecione pelo menos um canal de output.");
   }
-  const { data, error } = await supabase
-    .from("texts")
-    .insert(
-      channelKeys.map((channelKey) => ({
-        user_id: user.id,
+
+  const buildInsertRows = (includeSourceBundleId: boolean) =>
+    channelKeys.map((channelKey) => ({
+      user_id: user.id,
+      ...buildMinimalTextInsertPayload({
         title: input.title,
-        original_text: input.originalText,
-        profile_id: input.profileId,
-        channel_key: channelKey,
-        status: "rascunho",
-        objetivo: controls.objetivo,
-        cta: controls.cta,
-        tom: controls.tom,
-        tamanho: controls.tamanho,
-        formalidade: controls.formalidade,
-        usar_emojis: controls.usarEmojis,
-        usar_hashtags: controls.usarHashtags,
-        primeira_pessoa: controls.primeiraPessoa,
-        nivel_ousadia: controls.nivelOusadia,
-        instrucoes_extras: controls.instrucoesExtras,
-      })),
-    )
+        originalText: input.originalText,
+        profileId: input.profileId,
+        channelKey,
+        sourceBundleId: includeSourceBundleId ? sourceBundleId : undefined,
+      }),
+    }));
+
+  let result = await supabase
+    .from("texts")
+    .insert(buildInsertRows(true))
     .select("id, channel_key");
 
-  if (error) {
-    throw new Error(error.message);
+  if (result.error && isMissingSourceBundleIdColumnError(result.error)) {
+    result = await supabase
+      .from("texts")
+      .insert(buildInsertRows(false))
+      .select("id, channel_key");
   }
 
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  await Promise.all(
+    (result.data ?? []).map((row) =>
+      patchTextControls(supabase, user.id, row.id, input.controls ?? {}),
+    ),
+  );
+
   return {
-    created: (data ?? []) as Array<{ id: string; channel_key: ChannelKey }>,
+    created: (result.data ?? []) as Array<{ id: string; channel_key: ChannelKey }>,
   };
 }
 
@@ -301,29 +531,94 @@ export async function updateTextDraft(
 
   const { supabase, user } = await requireReadyUser();
   const relatedOutputIds = detail.related_outputs.map((output) => output.id);
+  const baseUpdate = {
+    title: input.title,
+    original_text: input.originalText,
+    profile_id: input.profileId,
+  };
+
+  const result = await supabase
+    .from("texts")
+    .update(baseUpdate)
+    .in("id", relatedOutputIds)
+    .eq("user_id", user.id);
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  await Promise.all(
+    relatedOutputIds.map((textId) => patchTextControls(supabase, user.id, textId, input.controls)),
+  );
+}
+
+export async function updateSharedBase(
+  textId: string,
+  input: {
+    originalText: string;
+    baseActive: boolean;
+  },
+) {
+  const detail = await getTextDetail(textId);
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
+  const { supabase, user } = await requireReadyUser();
+  const relatedOutputIds = detail.related_outputs.map((output) => output.id);
+
+  let result = await supabase
+    .from("texts")
+    .update({
+      original_text: input.originalText,
+      base_active: input.baseActive,
+    })
+    .in("id", relatedOutputIds)
+    .eq("user_id", user.id);
+
+  if (result.error && isMissingBaseActiveColumnError(result.error)) {
+    result = await supabase
+      .from("texts")
+      .update({
+        original_text: input.originalText,
+      })
+      .in("id", relatedOutputIds)
+      .eq("user_id", user.id);
+  }
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+}
+
+export async function updateTextGenerationSettings(
+  textId: string,
+  input: {
+    profileId: string;
+    controls: Partial<TextControls>;
+  },
+) {
+  const detail = await getTextDetail(textId);
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
+  const { supabase, user } = await requireReadyUser();
   const { error } = await supabase
     .from("texts")
     .update({
-      title: input.title,
-      original_text: input.originalText,
       profile_id: input.profileId,
-      objetivo: input.controls.objetivo,
-      cta: input.controls.cta,
-      tom: input.controls.tom,
-      tamanho: input.controls.tamanho,
-      formalidade: input.controls.formalidade,
-      usar_emojis: input.controls.usarEmojis,
-      usar_hashtags: input.controls.usarHashtags,
-      primeira_pessoa: input.controls.primeiraPessoa,
-      nivel_ousadia: input.controls.nivelOusadia,
-      instrucoes_extras: input.controls.instrucoesExtras,
     })
-    .in("id", relatedOutputIds)
+    .eq("id", textId)
     .eq("user_id", user.id);
 
   if (error) {
     throw new Error(error.message);
   }
+
+  await patchTextControls(supabase, user.id, textId, input.controls);
 }
 
 export async function duplicateText(textId: string) {
@@ -366,10 +661,14 @@ export async function createAdditionalOutputs(textId: string, channelKeys: Chann
     profileId: detail.profile_id,
     channelKeys: missingChannels,
     controls: mapControls(detail),
+    sourceBundleId: detail.source_bundle_id ?? undefined,
   });
 }
 
-export async function saveManualVersion(textId: string, payload: { textoFinal: string; notes: string }) {
+export async function saveManualVersion(
+  textId: string,
+  payload: { textoFinal: string; notes: string; nextStatus?: TextStatus },
+) {
   const detail = await getTextDetail(textId);
 
   if (!detail) {
@@ -387,6 +686,12 @@ export async function saveManualVersion(textId: string, payload: { textoFinal: s
     resumo_das_alteracoes:
       currentOutput?.resumo_das_alteracoes ?? "Versao manual salva no app.",
     metadados_do_canal: currentOutput?.metadados_do_canal ?? {},
+    diagnostico: currentOutput?.diagnostico,
+    preset_aplicado: currentOutput?.preset_aplicado,
+    modo_operacao: currentOutput?.modo_operacao,
+    score_humanizacao: currentOutput?.score_humanizacao,
+    alertas: currentOutput?.alertas,
+    relatorio_curto: currentOutput?.relatorio_curto,
   };
 
   const { data, error } = await supabase
@@ -406,11 +711,14 @@ export async function saveManualVersion(textId: string, payload: { textoFinal: s
     throw new Error(error.message);
   }
 
+  const nextStatus = payload.nextStatus ?? "em_revisao";
+  assertTransition(detail.status, nextStatus);
+
   const { error: textError } = await supabase
     .from("texts")
     .update({
       current_version_id: data.id,
-      status: "em_revisao",
+      status: nextStatus,
     })
     .eq("id", textId)
     .eq("user_id", user.id);
@@ -421,6 +729,10 @@ export async function saveManualVersion(textId: string, payload: { textoFinal: s
 }
 
 function assertTransition(current: TextStatus, next: TextStatus) {
+  if (current === next) {
+    return;
+  }
+
   const validTransitions: Record<TextStatus, TextStatus[]> = {
     rascunho: ["gerado", "arquivado"],
     gerado: ["em_revisao", "aprovado", "arquivado"],
@@ -451,6 +763,42 @@ export async function updateTextStatus(
   const { error } = await supabase
     .from("texts")
     .update({
+      status: payload.nextStatus,
+      published_url: payload.nextStatus === "publicado" ? payload.publishedUrl ?? null : null,
+      published_at: payload.nextStatus === "publicado" ? new Date().toISOString() : null,
+    })
+    .eq("id", textId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function setCurrentTextVersion(
+  textId: string,
+  versionId: string,
+  payload: { nextStatus: TextStatus; publishedUrl?: string },
+) {
+  const detail = await getTextDetail(textId);
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
+  const targetVersion = detail.versions.find((version) => version.id === versionId);
+
+  if (!targetVersion) {
+    throw new Error("Versao nao encontrada.");
+  }
+
+  assertTransition(detail.status, payload.nextStatus);
+
+  const { supabase, user } = await requireReadyUser();
+  const { error } = await supabase
+    .from("texts")
+    .update({
+      current_version_id: versionId,
       status: payload.nextStatus,
       published_url: payload.nextStatus === "publicado" ? payload.publishedUrl ?? null : null,
       published_at: payload.nextStatus === "publicado" ? new Date().toISOString() : null,
@@ -547,3 +895,86 @@ export async function insertGenerationError(textId: string, message: string) {
     throw new Error(error.message);
   }
 }
+
+export async function softDeleteTextVersion(
+  versionId: string,
+  reason = "Versao removida da biblioteca.",
+) {
+  const { supabase, user } = await requireReadyUser();
+  const { data: version, error: versionError } = await supabase
+    .from("text_versions")
+    .select("*")
+    .eq("id", versionId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (versionError) {
+    throw new Error(versionError.message);
+  }
+
+  if (!version) {
+    throw new Error("Versao nao encontrada.");
+  }
+
+  if ("deleted_at" in version && version.deleted_at) {
+    return;
+  }
+
+  if (!("deleted_at" in version)) {
+    throw new Error(
+      "O banco ainda nao suporta apagar versoes pela biblioteca. Aplique a migracao de soft delete primeiro.",
+    );
+  }
+
+  const detail = await getTextDetail(String(version.text_id));
+
+  if (!detail) {
+    throw new Error("Texto nao encontrado.");
+  }
+
+  const { error } = await supabase
+    .from("text_versions")
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user.id,
+      deleted_reason: reason,
+    })
+    .eq("id", versionId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (detail.current_version_id !== versionId) {
+    return;
+  }
+
+  const remainingVersions = await listTextVersionsByTextId({
+    textId: String(version.text_id),
+    userId: user.id,
+  });
+
+  const nextVersion = remainingVersions.sort(sortVersionsNewestFirst)[0] ?? null;
+  const nextStatus = nextVersion
+    ? detail.status === "arquivado"
+      ? "arquivado"
+      : nextVersion.source === "manual"
+        ? "em_revisao"
+        : "gerado"
+    : "rascunho";
+
+  const { error: textError } = await supabase
+    .from("texts")
+    .update({
+      current_version_id: nextVersion?.id ?? null,
+      status: nextStatus,
+    })
+    .eq("id", version.text_id)
+    .eq("user_id", user.id);
+
+  if (textError) {
+    throw new Error(textError.message);
+  }
+}
+

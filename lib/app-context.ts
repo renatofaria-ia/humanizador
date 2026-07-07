@@ -25,10 +25,6 @@ export async function getAppAccess(): Promise<AppAccess> {
     return { mode: "login-required" };
   }
 
-  if (env.ownerEmail && user.email !== env.ownerEmail) {
-    return { mode: "forbidden", email: user.email ?? null };
-  }
-
   return {
     mode: "ready",
     user: {
@@ -43,11 +39,9 @@ export async function requireReadyUser() {
 
   if (access.mode !== "ready") {
     throw new Error(
-      access.mode === "forbidden"
-        ? `Acesso negado para ${access.email ?? "usuario desconhecido"}.`
-        : access.mode === "login-required"
-          ? "Login obrigatorio."
-          : "Supabase nao configurado.",
+      access.mode === "login-required"
+        ? "Login obrigatorio."
+        : "Supabase nao configurado.",
     );
   }
 
@@ -62,8 +56,4 @@ export async function requireReadyUser() {
     user: access.user,
     supabase,
   };
-}
-
-export function getRedirectUrl(path = "/auth/callback") {
-  return `${getAppEnv().siteUrl}${path}`;
 }
