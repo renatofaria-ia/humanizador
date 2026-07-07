@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { type ReactNode, useId, useMemo, useState } from "react";
 
 import {
@@ -623,17 +622,6 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
           <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
             {truncateText(bundle.originalText)}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-[var(--ink-muted)]">
-            <span className="info-chip">
-              Perfil {bundle.profileName}
-            </span>
-            <span className="info-chip">
-              {bundle.outputs.length} output{bundle.outputs.length > 1 ? "s" : ""}
-            </span>
-            <span className="info-chip">
-              Atualizado em {formatDate(bundle.updatedAt)}
-            </span>
-          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {generatedOutputs.map((output) => (
               <span
@@ -757,7 +745,7 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
                 </div>
               </form>
             ) : (
-              <div className="mt-4 rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
+              <div className="mt-4 min-h-[12rem] rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
                 <p className="text-xs font-semibold text-[var(--ink-muted)]">{bundle.title}</p>
                 <div className="text-scroll-area text-scroll-area-compact mt-3">
                   <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--ink-soft)]">
@@ -825,7 +813,7 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
                       onSubmit={(event) => {
                         if (
                           !window.confirm(
-                            `Apagar a ${selectedVersionLabel?.toLowerCase() ?? "versao selecionada"} deste output?`,
+                            `Apagar a ${selectedVersionLabel?.toLowerCase() ?? "versÃ£o selecionada"} deste texto?`,
                           )
                         ) {
                           event.preventDefault();
@@ -837,7 +825,7 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
                       <input
                         type="hidden"
                         name="reason"
-                        value={`Soft delete da ${selectedVersionLabel ?? "versao"} pela biblioteca.`}
+                        value={`ExclusÃ£o suave da ${selectedVersionLabel ?? "versÃ£o"} pela biblioteca.`}
                       />
                       <button
                         type="submit"
@@ -935,14 +923,14 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
                         { name: "text_id", value: selectedOutput.id },
                         {
                           name: "notes",
-                          value: `Regerado pela biblioteca a partir de ${selectedVersionLabel ?? "uma versao anterior"} com perfil e ajustes revisados.`,
+                          value: `Regerado pela biblioteca a partir de ${selectedVersionLabel ?? "uma versÃ£o anterior"} com perfil e ajustes revisados.`,
                         },
                       ]}
                       onCancel={handleCancelGenerate}
                       profiles={profiles}
                     />
                   ) : (
-                    <div className="mt-4 rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
+                    <div className="mt-4 min-h-[12rem] rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="text-xs font-semibold text-[var(--ink-muted)]">
                           {selectedVersionLabel}
@@ -983,27 +971,21 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
                       profiles={profiles}
                     />
                   ) : (
-                    <div className="mt-4 rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
+                    <div className="mt-4 min-h-[12rem] rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
                         <p className="text-sm leading-7 text-[var(--ink-soft)]">
-                          Ainda não existe uma versão gerada para este output.
+                          Ainda não existe uma versão gerada para este texto.
                         </p>
                     </div>
                   )}
                 </>
               )}
-
-              <div className="mt-4">
-                <Link href={`/texts/${selectedOutput.id}`} className="button-ink">
-                  Abrir workspace
-                </Link>
-              </div>
             </article>
           ) : (
             <article className="rounded-[24px] border border-[var(--border)] bg-white/82 p-5">
               <h3 className="text-lg font-semibold text-[var(--ink)]">
                 {getChannelLabel(selectedChannelKey)}
               </h3>
-              <div className="mt-4 rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
+              <div className="mt-4 min-h-[12rem] rounded-[20px] border border-[var(--border)] bg-[var(--surface-soft)]/70 p-4">
                 {selectedChannelPreset ? (
                   <div className="space-y-4">
                     <div>
@@ -1082,7 +1064,7 @@ export function TextBundleCard({ bundle, profiles, isDemo }: TextBundleCardProps
             </article>
 
             <article className="rounded-[24px] border border-[var(--border)] bg-white/82 p-5">
-              <p className="text-sm font-semibold text-[var(--accent)]">Pistas de revisao</p>
+              <p className="text-sm font-semibold text-[var(--accent)]">Pistas de revisão</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {selectedReviewClues.length ? (
                   selectedReviewClues.map((pattern) => (

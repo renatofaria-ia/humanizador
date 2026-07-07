@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { DashboardShell } from "@/components/dashboard-shell";
@@ -9,8 +9,6 @@ import { CHANNEL_PRESETS } from "@/lib/channel-presets";
 import { getAppAccess } from "@/lib/app-context";
 import { listProfiles, listTexts } from "@/lib/data";
 import { demoProfiles, demoTextBundles } from "@/lib/demo-data";
-import { TEXT_STATUSES, TextSummary } from "@/lib/types";
-import { getStatusMeta } from "@/lib/ui";
 
 type TextsPageSearchParams = {
   q?: string;
@@ -128,56 +126,12 @@ export default async function TextsPage({
       <div className="mx-auto max-w-6xl space-y-6">
         {isDemo ? <SetupCallout title="Textos em modo demonstracao" /> : null}
 
-        <TextViewTabs activeView="biblioteca" />
-
-        <section className="surface-card rounded-[32px] p-6">
-          <form
-            method="get"
-            className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,0.5fr))_auto_auto]"
-          >
-            <div>
-              <label className="field-label">Buscar</label>
-              <input
-                name="q"
-                defaultValue={params.q ?? ""}
-                className="field"
-                placeholder="Titulo, perfil ou trecho da base"
-              />
-            </div>
-            <div>
-              <label className="field-label">Status</label>
-              <select name="status" defaultValue={statusFilter} className="field">
-                <option value="">Todos</option>
-                {TEXT_STATUSES.map((status) => (
-                  <option key={status} value={status}>
-                    {getStatusMeta(status).label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="field-label">Formato</label>
-              <select name="channel" defaultValue={channelFilter} className="field">
-                <option value="">Todos</option>
-                {CHANNEL_PRESETS.map((preset) => (
-                  <option key={preset.key} value={preset.key}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button type="submit" className="button-primary w-full">
-                Aplicar
-              </button>
-            </div>
-            <div className="flex items-end">
-              <Link href="/texts" className="button-secondary w-full">
-                Limpar
-              </Link>
-            </div>
-          </form>
-        </section>
+        <TextViewTabs
+          activeView="biblioteca"
+          query={params.q ?? ""}
+          statusFilter={statusFilter}
+          channelFilter={channelFilter}
+        />
 
         <section className="space-y-4">
           {visibleBundles.length ? (
@@ -212,4 +166,3 @@ export default async function TextsPage({
     </DashboardShell>
   );
 }
-

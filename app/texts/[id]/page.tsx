@@ -78,7 +78,7 @@ export default async function TextDetailPage({
   return (
     <DashboardShell email={access.mode === "ready" ? access.user.email : undefined}>
       <div className="space-y-6">
-        {isDemo ? <SetupCallout title="Workspace em modo demonstracao" /> : null}
+        {isDemo ? <SetupCallout title="Área de trabalho em modo demonstração" /> : null}
 
         <section className="surface-card rounded-[32px] p-6 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -96,10 +96,10 @@ export default async function TextDetailPage({
                 {text.title}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-soft)] text-pretty">
-                Perfil {text.profile?.nome ?? "-"} . Atualizado em {formatDate(text.updated_at)} .
+                Perfil {text.profile?.nome ?? "-"} · Atualizado em {formatDate(text.updated_at)} ·
                 {hasOutput
-                  ? " O texto final ja existe e pode seguir para revisao ou publicacao."
-                  : " A base ainda precisa gerar a primeira sugestao."}
+                  ? " O texto final já existe e pode seguir para revisão ou publicação."
+                  : " A base ainda precisa gerar a primeira sugestão."}
               </p>
             </div>
 
@@ -107,9 +107,9 @@ export default async function TextDetailPage({
               {activeTab === "base" ? (
                 <form action={isDemo ? undefined : generateTextAction}>
                   <input type="hidden" name="text_id" value={text.id} />
-                  <input type="hidden" name="notes" value="Geracao direta pelo workspace." />
+                  <input type="hidden" name="notes" value="Geração direta pela área de trabalho." />
                   <SubmitButton
-                    label={hasOutput ? "Gerar nova sugestao" : "Gerar sugestao"}
+                    label={hasOutput ? "Gerar nova sugestão" : "Gerar sugestão"}
                     pendingLabel="Gerando..."
                   />
                 </form>
@@ -130,12 +130,12 @@ export default async function TextDetailPage({
           </div>
 
           <div className="mt-6 rounded-[28px] border border-[rgba(176,71,52,0.16)] bg-[linear-gradient(135deg,rgba(255,247,244,0.95),rgba(255,255,255,0.92))] p-5">
-            <p className="text-sm font-semibold text-[var(--accent)]">Proximo passo</p>
+            <p className="text-sm font-semibold text-[var(--accent)]">Próximo passo</p>
             <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">{statusMeta.actionLabel}</h2>
             <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
               {hasOutput
                 ? statusMeta.helper
-                : "Revise a base, confirme o perfil e gere a primeira sugestao para abrir a etapa de revisao."}
+                : "Revise a base, confirme o perfil e gere a primeira sugestão para abrir a etapa de revisão."}
             </p>
           </div>
         </section>
@@ -145,7 +145,7 @@ export default async function TextDetailPage({
             {[
               ["base", "Base"],
               ["texto-final", "Texto final"],
-              ["publicacao", "Publicacao"],
+              ["publicacao", "Publicação"],
               ["historico", "Historico"],
             ].map(([tab, label]) => {
               const active = activeTab === tab;
@@ -170,7 +170,7 @@ export default async function TextDetailPage({
             <article className="surface-card rounded-[32px] p-6 sm:p-8">
               <p className="text-sm font-semibold text-[var(--accent)]">Base do texto</p>
               <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                Ajuste apenas o que muda a proxima geracao
+                Ajuste apenas o que muda a prÃ³xima geraÃ§Ã£o
               </h2>
               <form action={isDemo ? undefined : updateTextDraftAction} className="mt-6">
                 <input type="hidden" name="text_id" value={text.id} />
@@ -346,8 +346,8 @@ export default async function TextDetailPage({
                 </h2>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
                   <li>Titulo interno claro para localizar o texto depois.</li>
-                  <li>Perfil alinhado com a voz que voce quer reproduzir.</li>
-                  <li>Texto base com contexto suficiente para a proxima geracao.</li>
+                  <li>Perfil alinhado com a voz que vocÃª quer reproduzir.</li>
+                  <li>Texto base com contexto suficiente para a prÃ³xima geraÃ§Ã£o.</li>
                 </ul>
               </article>
 
@@ -391,7 +391,7 @@ export default async function TextDetailPage({
               <article className="surface-card rounded-[32px] p-6">
                 <p className="text-sm font-semibold text-[var(--accent)]">Texto final</p>
                 <h2 className="mt-2 text-xl font-semibold text-[var(--ink)]">
-                  Edite a versao que segue para aprovacao
+                  Edite a versÃ£o que segue para aprovaÃ§Ã£o
                 </h2>
                 <form action={isDemo ? undefined : saveManualVersionAction} className="mt-6">
                   <input type="hidden" name="text_id" value={text.id} />
@@ -404,16 +404,16 @@ export default async function TextDetailPage({
                     />
                   </div>
                   <div className="mt-4">
-                    <label className="field-label">Notas desta versao</label>
+                    <label className="field-label">Notas desta versÃ£o</label>
                     <input
                       name="notes"
                       className="field"
-                      placeholder="O que mudou nesta versao?"
+                      placeholder="O que mudou nesta versÃ£o?"
                     />
                   </div>
                   <div className="mt-6 flex flex-wrap gap-3">
                     <SubmitButton
-                      label="Salvar versao manual"
+                      label="Salvar versÃ£o manual"
                       pendingLabel="Salvando..."
                     />
                   </div>
@@ -434,7 +434,7 @@ export default async function TextDetailPage({
                 </article>
 
                 <article className="surface-card rounded-[32px] p-6">
-                  <p className="text-sm font-semibold text-[var(--accent)]">Pistas de revisao</p>
+                  <p className="text-sm font-semibold text-[var(--accent)]">Pistas de revisÃ£o</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {patternBadges.length ? (
                       patternBadges.map((pattern) => (
@@ -469,11 +469,11 @@ export default async function TextDetailPage({
           ) : (
             <section className="surface-card rounded-[32px] p-6 sm:p-8">
               <h2 className="text-2xl font-semibold text-[var(--ink)]">
-                Ainda nao existe texto final para revisar.
+                Ainda não existe texto final para revisar.
               </h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                O caminho natural e abrir a aba Base, revisar o contexto e usar a acao Gerar
-                sugestao.
+                O caminho natural é abrir a aba Base, revisar o contexto e usar a ação Gerar
+                sugestão.
               </p>
               <Link href={buildTabHref(text.id, "base")} className="button-primary mt-5">
                 Ir para a base
@@ -485,7 +485,7 @@ export default async function TextDetailPage({
         {activeTab === "publicacao" ? (
           <section className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
             <article className="surface-card rounded-[32px] p-6">
-              <p className="text-sm font-semibold text-[var(--accent)]">Publicacao</p>
+              <p className="text-sm font-semibold text-[var(--accent)]">PublicaÃ§Ã£o</p>
               <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
                 Atualize o status e registre o link final
               </h2>
@@ -589,7 +589,7 @@ export default async function TextDetailPage({
                 Versoes registradas deste texto
               </h2>
               <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-                Ultima versao: {latestVersion ? `v${latestVersion.version_number}` : "nenhuma"}.
+                Última versão: {latestVersion ? `v${latestVersion.version_number}` : "nenhuma"}.
               </p>
               <div className="mt-6 space-y-3">
                 {text.versions.map((version) => (
@@ -599,7 +599,7 @@ export default async function TextDetailPage({
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-[var(--ink)]">
-                        Versao {version.version_number} / {version.source}
+                        VersÃ£o {version.version_number} / {version.source}
                       </p>
                       <p className="text-xs text-[var(--ink-muted)]">{formatDate(version.created_at)}</p>
                     </div>
@@ -615,10 +615,9 @@ export default async function TextDetailPage({
             </article>
 
             <article className="surface-card rounded-[32px] p-6">
-              <p className="text-sm font-semibold text-[var(--accent)]">Historico tecnico</p>
+              <p className="text-sm font-semibold text-[var(--accent)]">Histórico técnico</p>
               <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                Auditoria recolhida fora da area principal
-              </h2>
+                Auditoria recolhida fora da área principal</h2>
               {currentOutput ? (
                 <div className="mt-5 space-y-5">
                   {currentOutput.relatorio_curto ? (
@@ -701,8 +700,7 @@ export default async function TextDetailPage({
               ) : (
                 <div className="mt-5 rounded-[24px] border border-dashed border-[var(--border-strong)] bg-white/70 p-5">
                   <p className="text-sm font-semibold text-[var(--ink)]">
-                    A auditoria tecnica aparece aqui depois da primeira geracao.
-                  </p>
+                    A auditoria técnica aparece aqui depois da primeira geração.</p>
                 </div>
               )}
             </article>

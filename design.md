@@ -146,8 +146,10 @@ O app deve parecer um workspace editorial privado: leve, caloroso, preciso e ori
 ## Padroes por tela
 
 ### Painel
-- Cards de metricas com leitura imediata.
-- Blocos de perfis e textos em paineis separados.
+- A home funciona como cockpit analitico privado, nao como fila operacional.
+- O topo combina leitura institucional do periodo com filtro interno e badges discretos.
+- KPIs, serie temporal e breakdowns precisam ser legiveis em segundos, sem virar dashboard corporativo frio.
+- Links permitidos devem ser discretos e de navegacao, nunca CTA de comando operacional.
 
 ### Perfis
 - Formulario superior longo e confortavel.

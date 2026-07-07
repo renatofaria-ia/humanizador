@@ -1,6 +1,8 @@
 sequenceDiagram
   participant U as Usuario
-  participant P as Biblioteca / workspace
+  participant N as /texts/new
+  participant T as /texts/[id]
+  participant B as Biblioteca
   participant A as actions.ts
   participant AUTH as requireReadyUser()
   participant D as data.ts
@@ -8,11 +10,30 @@ sequenceDiagram
   participant O as OpenAI API
   participant DB as Postgres
 
-  U->>P: Gerar com IA ou Regerar
-  P->>A: generateTextFromLibraryAction() ou generateTextAction()
-  A->>D: updateTextGenerationSettings()
-  D->>DB: update texts.profile_id + controles
+  U->>N: criar novo texto
+  N->>A: createTextAction()
+  A->>D: createTextBundle()
+  D->>DB: insert texts + outputs
+  A-->>N: redirect(/texts/[id])
+
+  U->>T: gerar sugestao base
+  T->>A: generateTextAction()
   A->>D: generateVersionForText()
+  D->>AUTH: validar sessao pronta
+  AUTH-->>D: ready user + supabase
+  D->>DB: getTextDetail()
+  DB-->>D: profile + versions + related_outputs + modo_operacao + preset_de_voz
+  D->>G: generateHumanizedOutput(modo, preset)
+  G->>O: generateObject()
+
+  U->>T: adicionar formatos
+  T->>A: createAdditionalOutputsAction()
+  A->>D: createAdditionalOutputs()
+  D->>DB: insert novos outputs
+
+  U->>B: gerar com IA pela biblioteca
+  B->>A: generateTextFromLibraryAction()
+  A->>D: generateVersionFromLibrary()
   D->>AUTH: validar sessao pronta
   AUTH-->>D: ready user + supabase
   D->>DB: getTextDetail()
@@ -24,8 +45,8 @@ sequenceDiagram
     O-->>G: payload v2 + score + diagnostico
     G->>DB: insert text_versions (llm)
     G->>DB: update text current_version_id/status
-    A-->>P: revalidatePath() + redirect(/texts/[id]?tab=texto-final)
+    A-->>T: revalidatePath() + redirect(/texts/[id]?tab=texto-final)
   else erro
     G->>DB: insertGenerationError()
-    A-->>P: revalidatePath() + redirect(/texts/[id]?tab=historico)
+    A-->>T: revalidatePath() + redirect(/texts/[id]?tab=historico)
   end

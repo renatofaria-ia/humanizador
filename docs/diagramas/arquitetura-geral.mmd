@@ -1,8 +1,9 @@
 %%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
 flowchart LR
   subgraph APP["Aplicacao"]
-    UI["UI<br/>pages: / (Hoje), /texts (Biblioteca), /texts/new (Novo texto), /texts/[id], /profiles, /login<br/>components/*"]
-    SV["App server<br/>actions, api, app-context<br/>data, generation, proxy"]
+    UI["UI<br/>pages: / (Painel cockpit), /texts (Biblioteca), /texts/new (Novo texto), /texts/[id], /profiles, /login<br/>components/*"]
+    SV["App server<br/>actions, api, app-context<br/>data, dashboard-cockpit, generation, proxy"]
+    CK["Cockpit server-side<br/>agregacao por periodo e user_id<br/>tokens, textos, palavras, output, llm"]
     JOB["Jobs<br/>nao ha fila dedicada"]
   end
 
@@ -15,5 +16,7 @@ flowchart LR
   UI -->|navegacao| SV
   SV -->|login| AUTH
   SV -->|CRUD + RLS| DB
+  SV -->|metricas do painel| CK
+  CK -->|leituras por user_id + RLS| DB
   SV -->|geracao| AI
   SV -.-> JOB

@@ -1,19 +1,42 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import {
+  DASHBOARD_KPI_META,
+  DashboardBreakdownPanel,
+  DashboardInsightsPanel,
+  DashboardKpiCard,
+  DashboardPeriodFilter,
+  DashboardSeriesPanel,
+  DashboardStatusPanel,
+} from "@/components/dashboard-cockpit";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { GlossaryStrip } from "@/components/glossary-strip";
-import { NextStepCard } from "@/components/next-step-card";
-import { PageIntro } from "@/components/page-intro";
 import { SetupCallout } from "@/components/setup-callout";
-import { StatusBadge } from "@/components/status-badge";
+import {
+  DASHBOARD_PERIODS,
+  DashboardPeriod,
+  buildDashboardCockpitData,
+  getDashboardCockpit,
+} from "@/lib/dashboard-cockpit";
 import { getAppAccess } from "@/lib/app-context";
-import { listProfiles, listTexts } from "@/lib/data";
-import { demoProfiles, demoTextBundles } from "@/lib/demo-data";
-import { getChannelLabel, getGlossaryItems, getStatusMeta } from "@/lib/ui";
-import { formatDate } from "@/lib/utils";
+import { demoTextBundles } from "@/lib/demo-data";
 
-export default async function HomePage() {
+type HomePageProps = {
+  searchParams?: Promise<{
+    period?: string | string[];
+  }>;
+};
+
+function parseDashboardPeriod(value: string | string[] | undefined): DashboardPeriod {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  return DASHBOARD_PERIODS.includes(candidate as DashboardPeriod)
+    ? (candidate as DashboardPeriod)
+    : "today";
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = (await searchParams) ?? {};
+  const period = parseDashboardPeriod(params.period);
   const access = await getAppAccess();
 
   if (access.mode === "login-required") {
@@ -21,231 +44,79 @@ export default async function HomePage() {
   }
 
   const isDemo = access.mode === "setup";
-  const profiles = isDemo ? demoProfiles : await listProfiles();
-  const texts = isDemo ? demoTextBundles : await listTexts();
-  const activeTexts = texts.filter((text) => !["publicado", "arquivado"].includes(text.status));
-  const completedTexts = texts.filter((text) => ["publicado", "arquivado"].includes(text.status));
-  const nextText = activeTexts[0];
+  const cockpit = isDemo
+    ? buildDashboardCockpitData({ texts: demoTextBundles, period })
+    : await getDashboardCockpit(period);
 
   return (
     <DashboardShell email={access.mode === "ready" ? access.user.email : undefined}>
       <div className="space-y-6">
-        {isDemo ? <SetupCallout title="Modo demonstracao ativo" /> : null}
+        {isDemo ? <SetupCallout title="Modo demonstração ativo" /> : null}
 
-        <PageIntro
-          eyebrow="Hoje"
-          title="O painel de hoje mostra o que pede acao agora."
-          description="Retome um texto, acompanhe a fila ativa e volte a produzir sem procurar onde cada etapa ficou."
-          actions={
-            <>
-              <Link href="/texts/new" className="button-primary">
-                Novo texto
-              </Link>
-              <Link href="/texts" className="button-secondary">
-                Abrir textos
-              </Link>
-            </>
-          }
-        />
-
-        <NextStepCard
-          title={
-            nextText
-              ? `${getStatusMeta(nextText.status).actionLabel}: ${nextText.title}`
-              : "Nenhum texto ativo no momento"
-          }
-          description={
-            nextText
-              ? `${getStatusMeta(nextText.status).helper} Formato ${getChannelLabel(nextText.channel_key)}.`
-              : "Quando a fila estiver vazia, abra um novo texto e escolha um perfil antes de gerar."
-          }
-          actions={
-            nextText ? (
-              <Link href={`/texts/${nextText.id}`} className="button-ink">
-                Abrir texto
-              </Link>
-            ) : (
-              <Link href="/texts/new" className="button-ink">
-                Criar primeiro texto
-              </Link>
-            )
-          }
-        />
-
-        <GlossaryStrip items={getGlossaryItems(["perfil", "formato", "status"])} />
-
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              label: "Perfis ativos",
-              value: String(profiles.length),
-              helper: "Vozes prontas para reutilizar sem recriar regras do zero.",
-            },
-            {
-              label: "Textos em andamento",
-              value: String(activeTexts.length),
-              helper: "Itens que ainda pedem geracao, revisao, aprovacao ou publicacao.",
-            },
-            {
-              label: "Concluidos",
-              value: String(completedTexts.length),
-              helper: "Textos ja publicados ou arquivados na biblioteca.",
-            },
-            {
-              label: "Pronto para retomar",
-              value: nextText ? formatDate(nextText.updated_at) : "-",
-              helper: nextText
-                ? `Ultima movimentacao em ${getChannelLabel(nextText.channel_key)}.`
-                : "Sem item ativo para retomar agora.",
-            },
-          ].map((item) => (
-            <article key={item.label} className="surface-card rounded-[28px] p-6">
-              <p className="text-xs font-semibold text-[var(--ink-muted)]">
-                {item.label}
+        <section className="panel relative overflow-hidden p-6 sm:p-7">
+          <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(176,71,52,0.16),transparent_62%)]" />
+          <div className="absolute left-0 top-0 h-36 w-36 rounded-full bg-[radial-gradient(circle,rgba(205,227,255,0.72),transparent_72%)]" />
+          <div className="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+            <div className="max-w-4xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--ink-muted)]">
+                Painel
               </p>
-              <p className="mt-4 text-4xl font-semibold tracking-tight text-[var(--ink)] sm:text-5xl">
-                {item.value}
+              <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-tight text-[var(--ink)] text-balance sm:text-4xl xl:text-5xl">
+                Cockpit privado da operação editorial
+              </h1>
+              <p className="mt-4 max-w-4xl text-sm leading-8 text-[var(--ink-soft)] text-pretty sm:text-base">
+                A home consolida produção, consumo de LLM e saúde editorial do usuário logado em uma leitura única e rápida.
               </p>
-              <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">{item.helper}</p>
-            </article>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="info-chip">Somente dados do usuário logado</span>
+                <span className="info-chip info-chip-strong">{cockpit.rangeLabel}</span>
+                {isDemo ? <span className="info-chip">Leitura demonstrativa</span> : null}
+              </div>
+            </div>
+            <DashboardPeriodFilter currentPeriod={period} />
+          </div>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-12 items-stretch">
+          {DASHBOARD_KPI_META.map((item) => (
+            <DashboardKpiCard
+              key={item.key}
+              label={item.label}
+              value={cockpit.kpis[item.key]}
+              helper={item.helper}
+              icon={item.icon}
+              spotlight={"spotlight" in item ? item.spotlight : false}
+              className={item.className}
+            />
           ))}
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_360px]">
-          <article className="surface-card rounded-[32px] p-6 sm:p-8">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-[var(--accent)]">
-                  Em andamento
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                  Textos que pedem atencao agora
-                </h2>
-              </div>
-              <Link href="/texts" className="button-secondary">
-                Abrir textos
-              </Link>
-            </div>
-            <div className="mt-6 space-y-4">
-              {activeTexts.length ? (
-                activeTexts.slice(0, 4).map((text) => (
-                  <Link
-                    key={text.id}
-                    href={`/texts/${text.id}`}
-                    className="block rounded-[24px] border border-[var(--border)] bg-white/78 p-5 transition-transform hover:-translate-y-0.5"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-[var(--ink-muted)]">
-                          {getChannelLabel(text.channel_key)}
-                        </p>
-                        <h3 className="mt-2 text-lg font-semibold text-[var(--ink)]">
-                          {text.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                          {getStatusMeta(text.status).helper}
-                        </p>
-                        <p className="mt-2 text-xs text-[var(--ink-muted)]">
-                          Atualizado em {formatDate(text.updated_at)}
-                        </p>
-                      </div>
-                      <StatusBadge status={text.status} />
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="rounded-[24px] border border-dashed border-[var(--border-strong)] bg-white/70 p-5">
-                  <h3 className="text-lg font-semibold text-[var(--ink)]">Fila vazia</h3>
-                  <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                    Nao ha nenhum texto pedindo acao. Abra um novo e escolha o perfil antes de
-                    gerar.
-                  </p>
-                  <Link href="/texts/new" className="button-primary mt-4">
-                    Novo texto
-                  </Link>
-                </div>
-              )}
-            </div>
-          </article>
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.9fr)] xl:items-start">
+          <div className="space-y-6">
+            <DashboardSeriesPanel data={cockpit} />
+            <DashboardStatusPanel items={cockpit.statusBreakdown} href="/texts" hrefLabel="Abrir textos" />
+          </div>
 
           <div className="space-y-6">
-            <article className="surface-card rounded-[32px] p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--accent)]">
-                    Perfis
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                    Vozes prontas para reutilizar
-                  </h2>
-                </div>
-                <Link href="/profiles" className="button-secondary">
-                  Abrir perfis
-                </Link>
-              </div>
-              <div className="mt-6 space-y-4">
-                {profiles.slice(0, 3).map((profile) => (
-                  <div
-                    key={profile.id}
-                    className="rounded-[24px] border border-[var(--border)] bg-white/78 p-5"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h3 className="text-lg font-semibold text-[var(--ink)]">{profile.nome}</h3>
-                      <div className="rounded-[var(--radius-pill)] bg-[var(--surface-strong)] px-3 py-1 text-xs font-semibold text-[var(--ink-muted)]">
-                        Firmeza {profile.nivel_firmeza}/5
-                      </div>
-                    </div>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      {profile.descricao_curta}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="surface-card rounded-[32px] p-6">
-              <p className="text-sm font-semibold text-[var(--accent)]">
-                Concluidos
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-[var(--ink)]">
-                Biblioteca recente
-              </h2>
-              <div className="mt-6 space-y-4">
-                {completedTexts.length ? (
-                  completedTexts.slice(0, 3).map((text) => (
-                    <Link
-                      key={text.id}
-                      href={`/texts/${text.id}`}
-                      className="block rounded-[24px] border border-[var(--border)] bg-white/78 p-5"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="text-xs font-semibold text-[var(--ink-muted)]">
-                            {getChannelLabel(text.channel_key)}
-                          </p>
-                          <h3 className="mt-2 text-lg font-semibold text-[var(--ink)]">
-                            {text.title}
-                          </h3>
-                          <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                            {getStatusMeta(text.status).helper}
-                          </p>
-                        </div>
-                        <StatusBadge status={text.status} />
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="rounded-[24px] border border-dashed border-[var(--border-strong)] bg-white/70 p-5">
-                    <p className="text-sm font-semibold text-[var(--ink)]">
-                      Ainda nao existem textos concluidos.
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-                      Assim que um texto for publicado ou arquivado, ele aparece aqui.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </article>
+            <DashboardBreakdownPanel
+              eyebrow="Produzido por saída"
+              title="Distribuição por tipo de saída"
+              description="Leitura do recorte atual para identificar quais formatos puxam mais volume de versões."
+              items={cockpit.outputBreakdown}
+              emptyLabel="Nenhuma saída apareceu neste período."
+              href="/texts"
+              hrefLabel="Abrir textos"
+            />
+            <DashboardBreakdownPanel
+              eyebrow="Consumo por LLM"
+              title="Distribuição por modelo"
+              description="Mostra onde o consumo de tokens se concentrou entre os modelos com geração LLM no período."
+              items={cockpit.llmBreakdown}
+              emptyLabel="Nenhuma geração LLM ativa foi registrada neste período."
+              href="/texts"
+              hrefLabel="Abrir textos"
+            />
+            <DashboardInsightsPanel items={cockpit.insights} href="/profiles" hrefLabel="Abrir perfis" />
           </div>
         </section>
       </div>

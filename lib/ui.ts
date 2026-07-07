@@ -33,19 +33,19 @@ export type GlossaryKey = "perfil" | "formato" | "status" | "estilo-de-voz";
 const GLOSSARY_MAP: Record<GlossaryKey, { term: string; description: string }> = {
   perfil: {
     term: "Perfil",
-    description: "Define a voz reutilizavel do texto: tom, regras e calibragem.",
+    description: "Define a voz reutilizável do texto: tom, regras e calibragem.",
   },
   formato: {
     term: "Formato",
-    description: "Cada formato representa um canal de saida criado a partir da mesma base.",
+    description: "Cada formato representa um canal de saída criado a partir da mesma base.",
   },
   status: {
     term: "Status",
-    description: "Mostra em que etapa editorial o texto esta e qual e o proximo passo.",
+    description: "Mostra em que etapa editorial o texto está e qual é o próximo passo.",
   },
   "estilo-de-voz": {
     term: "Estilo de voz",
-    description: "Ajuste avancado que orienta a forma final do texto antes da geracao.",
+    description: "Ajuste avançado que orienta a forma final do texto antes da geração.",
   },
 };
 
@@ -60,32 +60,32 @@ export const STATUS_META: Record<
 > = {
   rascunho: {
     label: "Rascunho",
-    helper: "Base pronta; falta gerar a primeira sugestao.",
+    helper: "Base pronta; falta gerar a primeira sugestão.",
     actionLabel: "Falta gerar",
     tone: "border border-slate-200 bg-white/80 text-slate-700",
   },
   gerado: {
     label: "Gerado",
-    helper: "Ja existe uma sugestao; falta revisar o texto final.",
+    helper: "Já existe uma sugestão; falta revisar o texto final.",
     actionLabel: "Falta revisar",
     tone: "border border-amber-200 bg-amber-50 text-amber-800",
   },
   em_revisao: {
-    label: "Em revisao",
+    label: "Em revisão",
     helper: "Texto em ajuste manual; falta aprovar ou publicar.",
     actionLabel: "Falta aprovar",
     tone: "border border-sky-200 bg-sky-50 text-sky-800",
   },
   aprovado: {
     label: "Aprovado",
-    helper: "Texto aprovado internamente; falta registrar a publicacao.",
+    helper: "Texto aprovado internamente; falta registrar a publicação.",
     actionLabel: "Falta publicar",
     tone: "border border-emerald-200 bg-emerald-50 text-emerald-800",
   },
   publicado: {
     label: "Publicado",
-    helper: "Texto concluido e marcado como publicado.",
-    actionLabel: "Concluido",
+    helper: "Texto concluído e marcado como publicado.",
+    actionLabel: "Concluído",
     tone: "border border-violet-200 bg-violet-50 text-violet-800",
   },
   arquivado: {
@@ -114,7 +114,7 @@ export function getCurrentAreaLabel(pathname: string) {
   }
 
   if (pathname.startsWith("/texts/")) {
-    return "Workspace";
+    return "Área de trabalho";
   }
 
   return APP_NAV_LINKS.find((link) =>

@@ -13,10 +13,15 @@ stateDiagram-v2
   aprovado --> arquivado: arquivar
   publicado --> em_revisao: reabrir
 
+  note right of rascunho
+    Sem output gerado, a area de trabalho destaca a base
+    e a aba Texto final so aparece quando existe versao.
+  end note
+
   note right of em_revisao
     assertTransition()
   end note
 
   note left of rascunho
-    status do enum
+    status do enum text_status
   end note

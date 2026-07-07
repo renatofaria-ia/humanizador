@@ -1,6 +1,8 @@
 %%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear'}} }%%
 flowchart LR
-  ACC["Acesso ao app<br/>getAppAccess() / requireReadyUser()<br/>setup | login-required | ready"] --> SHELL["DashboardShell<br/>Hoje | Textos | Perfis | Novo<br/>nav mobile fixa + CTA"] --> LIB
+  ACC["Acesso ao app<br/>getAppAccess() / requireReadyUser()<br/>setup | login-required | ready"] --> SHELL["DashboardShell<br/>Painel cockpit | Textos | Perfis | Novo<br/>nav mobile fixa + home analitica"]
+  SHELL --> PANEL["/ (Painel)<br/>cockpit por periodo<br/>tokens, palavras, output, llm"]
+  SHELL --> LIB
 
   subgraph CRI["Criacao"]
     LIB["/texts<br/>Biblioteca<br/>resumo com outputs gerados<br/>expandido com formatos + versoes"] -. abre .-> N4["/texts/[id]<br/>abas: base, texto final, publicacao, historico"]

@@ -145,7 +145,7 @@ export async function createTextAction(formData: FormData) {
   const redirectId = created[0]?.id;
 
   if (!redirectId) {
-    throw new Error("Nenhum output foi criado para este texto.");
+    throw new Error("Nenhuma saÃ­da foi criada para este texto.");
   }
 
   revalidatePath("/");
@@ -244,7 +244,7 @@ export async function generateTextFromLibraryAction(formData: FormData) {
   const textId = String(formData.get("text_id") ?? "");
   const notes =
     String(formData.get("notes") ?? "").trim() ||
-    "Geracao iniciada pela biblioteca com ajustes definidos.";
+    "GeraÃ§Ã£o iniciada pela biblioteca com ajustes definidos.";
   let didGenerate = false;
 
   await updateTextGenerationSettings(textId, {
@@ -284,13 +284,13 @@ export async function createAndGenerateTextFromLibraryAction(formData: FormData)
   const channelKey = String(formData.get("channel_key") ?? "").trim();
   const notes =
     String(formData.get("notes") ?? "").trim() ||
-    "Output criado e gerado pela biblioteca com ajustes definidos.";
+    "SaÃ­da criada e gerada pela biblioteca com ajustes definidos.";
 
   const { created } = await createAdditionalOutputs(sourceTextId, [channelKey] as never);
   const textId = created[0]?.id;
 
   if (!textId) {
-    throw new Error("Nao foi possivel criar o output selecionado.");
+    throw new Error("NÃ£o foi possÃ­vel criar a saÃ­da selecionada.");
   }
 
   let didGenerate = false;
@@ -357,7 +357,7 @@ export async function deleteTextVersionAction(formData: FormData) {
   const versionId = String(formData.get("version_id") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
 
-  await softDeleteTextVersion(versionId, reason || "Versao removida da biblioteca.");
+  await softDeleteTextVersion(versionId, reason || "VersÃ£o removida da biblioteca.");
 
   revalidatePath(`/texts/${textId}`);
   revalidatePath("/texts");

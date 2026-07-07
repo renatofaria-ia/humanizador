@@ -201,12 +201,16 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.75rem;
+  min-width: 7.5rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.78);
-  padding: 0.55rem 1rem;
+  padding: 0.7rem 1rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--ink-soft);
   transition:
     border-color 160ms ease,
@@ -224,11 +228,14 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.75rem;
   border-radius: 1rem;
   background: var(--accent);
   padding: 0.8rem 1.25rem;
   font-size: 0.95rem;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--accent-foreground);
   box-shadow: var(--shadow-soft);
   transition:
@@ -250,12 +257,15 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.75rem;
   border-radius: 1rem;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.96);
   padding: 0.8rem 1.1rem;
   font-size: 0.95rem;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--ink);
   box-shadow: 0 1px 0 rgba(73, 97, 119, 0.08);
   transition:
@@ -282,11 +292,14 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.75rem;
   border-radius: 1rem;
   background: var(--ink);
   padding: 0.8rem 1.1rem;
   font-size: 0.95rem;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   color: white;
   transition: opacity 160ms ease;
 }
@@ -299,6 +312,7 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.5rem;
   border-radius: var(--radius-pill);
   padding: 0.45rem 0.65rem;
   color: var(--ink-soft);
