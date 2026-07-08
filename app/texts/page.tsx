@@ -9,6 +9,7 @@ import { CHANNEL_PRESETS } from "@/lib/channel-presets";
 import { getAppAccess } from "@/lib/app-context";
 import { listProfiles, listTexts } from "@/lib/data";
 import { demoProfiles, demoTextBundles } from "@/lib/demo-data";
+import type { TextSummary } from "@/lib/types";
 
 type TextsPageSearchParams = {
   q?: string;

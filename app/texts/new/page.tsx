@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 
 import { DashboardShell } from "@/components/dashboard-shell";
 import { NewTextForm } from "@/components/new-text-form";
@@ -23,7 +23,7 @@ export default async function NewTextPage() {
       <div className="mx-auto max-w-5xl space-y-6">
         {isDemo ? <SetupCallout title="Modo demonstração ativo" /> : null}
 
-        <TextViewTabs activeView="novo" />
+        <TextViewTabs activeView="novo" query="" statusFilter="" channelFilter="" />
 
         <section className="surface-card rounded-[32px] p-6 sm:p-8">
           <p className="text-sm font-semibold text-[var(--accent)]">Novo texto</p>
